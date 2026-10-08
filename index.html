@@ -211,6 +211,9 @@
             color: #78909c;
         }
 
+        .subtitulo-catalogo { color:#5d7771; font-size:13px; margin-top:8px; }
+        .preferencias-bebidas { margin-top:22px; }
+
         .alimentos-encabezado {
             display: flex;
             justify-content: space-between;
@@ -835,6 +838,99 @@
                 align-items: center;
             }
         }
+    
+        /* =========================
+           VOZ NURA
+        ========================= */
+        .voz-panel {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 32, 38, 0.48);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 9999;
+        }
+
+        .voz-card {
+            width: 100%;
+            max-width: 520px;
+            background: rgba(255,255,255,0.98);
+            border-radius: 28px;
+            padding: 28px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+        }
+
+        .voz-orb {
+            width: 96px;
+            height: 96px;
+            margin: 10px auto 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1b8f72, #55b78e);
+            color: white;
+            font-size: 38px;
+            box-shadow: 0 12px 28px rgba(27,143,114,0.28);
+        }
+
+        .voz-orb.escuchando {
+            animation: pulsoNura 1.15s infinite;
+        }
+
+        @keyframes pulsoNura {
+            0%, 100% { transform: scale(1); box-shadow: 0 12px 28px rgba(27,143,114,0.28); }
+            50% { transform: scale(1.08); box-shadow: 0 12px 36px rgba(27,143,114,0.48); }
+        }
+
+        .voz-estado {
+            min-height: 24px;
+            color: #607d7a;
+            margin: 10px 0 16px;
+        }
+
+        .voz-transcripcion {
+            min-height: 58px;
+            padding: 14px;
+            border-radius: 16px;
+            background: #f4f7f6;
+            color: #263238;
+            text-align: left;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .voz-ayuda {
+            font-size: 13px;
+            color: #78909c;
+            line-height: 1.5;
+            margin-top: 12px;
+        }
+
+    
+        .bebida-box {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: #f3f8f6;
+            color: #496662;
+            font-size: 14px;
+        }
+
+        .bebida-box strong { color: #245f55; }
+
+        .bebida-accion {
+            border: 0;
+            background: transparent;
+            color: #1b8f72;
+            font-weight: 700;
+            cursor: pointer;
+            margin-left: 6px;
+        }
+
     </style>
 </head>
 
@@ -850,6 +946,7 @@
 
     let datosNura = {
         nombre: "",
+        planTipo: "",
         voz: "",
         sexo: "",
         edad: "",
@@ -861,6 +958,7 @@
         alimentacion: "",
         alimentosIncluidos: [],
         alimentosEvitar: [],
+        bebidasPreferidas: [],
         dias: [],
         preparacionMaquina: {}
     };
@@ -904,7 +1002,50 @@
         ["frutas", "🍎 Frutas", "Frutas"],
         ["aguacate", "🥑 Aguacate", "Grasas"],
         ["nueces", "🥜 Nueces y semillas", "Grasas"],
-        ["yogur", "🥣 Yogur", "Lácteos"]
+        ["yogur", "🥣 Yogur", "Lácteos"],
+        ["camote", "🍠 Camote", "Tubérculos"],
+        ["quinoa", "🌾 Quinoa", "Cereales"],
+        ["pepino", "🥒 Pepino", "Vegetales"],
+        ["zanahoria", "🥕 Zanahoria", "Vegetales"],
+        ["espinaca", "🥬 Espinaca", "Vegetales"],
+        ["nopales", "🌵 Nopales", "Vegetales"],
+        ["calabacita", "🥒 Calabacita", "Vegetales"],
+        ["jitomate", "🍅 Jitomate", "Vegetales"],
+        ["brocoli", "🥦 Brócoli", "Vegetales"],
+        ["garbanzos", "🫘 Garbanzos", "Leguminosas"],
+        ["cremaCacahuate", "🥜 Crema de cacahuate", "Grasas"],
+        ["semillas", "🌻 Semillas", "Grasas"],
+        ["naranja", "🍊 Naranja", "Frutas"],
+        ["papaya", "🍈 Papaya", "Frutas"],
+        ["fresas", "🍓 Fresas", "Frutas"],
+        ["jamon", "🍖 Jamón", "Proteína"],
+        ["salchicha", "🌭 Salchicha", "Proteína"],
+        ["pavo", "🍗 Pechuga de pavo", "Proteína"],
+        ["cerdo", "🥩 Cerdo", "Proteína"],
+        ["camaron", "🦐 Camarón", "Proteína"],
+        ["sardina", "🐟 Sardina", "Proteína"],
+        ["tofu", "🧊 Tofu", "Proteína"],
+        ["champiñones", "🍄 Champiñones", "Vegetales"],
+        ["pimiento", "🫑 Pimiento", "Vegetales"],
+        ["cebolla", "🧅 Cebolla", "Vegetales"],
+        ["col", "🥬 Col", "Vegetales"],
+        ["lechuga", "🥬 Lechuga", "Vegetales"],
+        ["chayote", "🥒 Chayote", "Vegetales"],
+        ["elote", "🌽 Elote", "Vegetales"],
+        ["manzana", "🍎 Manzana", "Frutas"],
+        ["platano", "🍌 Plátano", "Frutas"],
+        ["pera", "🍐 Pera", "Frutas"],
+        ["mango", "🥭 Mango", "Frutas"],
+        ["uva", "🍇 Uvas", "Frutas"],
+        ["atunLata", "🥫 Atún en lata", "Proteína"],
+        ["mayonesa", "🥄 Mayonesa", "Complementos"],
+        ["crema", "🥛 Crema", "Lácteos"],
+        ["bolillo", "🥖 Bolillo", "Cereales"],
+        ["tostadas", "🫓 Tostadas", "Cereales"],
+        ["galletas", "🍘 Galletas saladas", "Cereales"],
+        ["aceite", "🫒 Aceite", "Complementos"],
+        ["chicharos", "🟢 Chícharos", "Vegetales"],
+        ["eloteGrano", "🌽 Granos de elote", "Vegetales"]
     ];
 
     const menuDesayuno = [
@@ -917,7 +1058,14 @@
         {texto:"Sándwich de pollo con verduras y fruta.", tags:["pollo","pan","verduras","frutas"]},
         {texto:"Sándwich de atún con verduras.", tags:["atun","pan","verduras"]},
         {texto:"Tostadas de frijoles con queso y aguacate.", tags:["frijoles","tortilla","queso","aguacate"]},
-        {texto:"Tostadas de lentejas con verduras y aguacate.", tags:["lentejas","tortilla","verduras","aguacate"]}
+        {texto:"Tostadas de lentejas con verduras y aguacate.", tags:["lentejas","tortilla","verduras","aguacate"]},
+        {texto:"Yogur con avena, plátano y semillas.", tags:["yogur","avena","frutas","semillas"]},
+        {texto:"Huevos con nopales y tortillas.", tags:["huevo","nopales","tortilla"]},
+        {texto:"Tazón de yogur con fresas y nueces.", tags:["yogur","fresas","nueces"]},
+        {texto:"Pan integral con crema de cacahuate y fruta.", tags:["pan","cremaCacahuate","frutas"]},
+        {texto:"Quesadillas de espinaca y queso.", tags:["queso","tortilla","espinaca"]},
+        {texto:"Avena con manzana y canela.", tags:["avena","frutas","leche"]},
+        {texto:"Tostadas de frijoles con huevo y pico de gallo.", tags:["frijoles","huevo","tortilla","jitomate"]}
     ];
 
     const menuComida = [
@@ -930,7 +1078,18 @@
         {texto:"Atún con pasta y verduras.", tags:["atun","pasta","verduras"]},
         {texto:"Lentejas con arroz y verduras.", tags:["lentejas","arroz","verduras"]},
         {texto:"Frijoles con arroz, verduras y aguacate.", tags:["frijoles","arroz","verduras","aguacate"]},
-        {texto:"Pollo con pasta y verduras.", tags:["pollo","pasta","verduras"]}
+        {texto:"Pollo con pasta y verduras.", tags:["pollo","pasta","verduras"]},
+        {texto:"Pechuga de pollo con camote y ensalada.", tags:["pollo","camote","verduras"]},
+        {texto:"Tazón de quinoa con pollo y brócoli.", tags:["quinoa","pollo","brocoli"]},
+        {texto:"Carne molida con papa y calabacita.", tags:["carne","papa","calabacita"]},
+        {texto:"Ensalada de atún con pepino y jitomate.", tags:["atun","pepino","jitomate","verduras"]},
+        {texto:"Pescado con quinoa y brócoli.", tags:["pescado","quinoa","brocoli"]},
+        {texto:"Tacos de pollo con nopales.", tags:["pollo","tortilla","nopales"]},
+        {texto:"Garbanzos guisados con arroz y verduras.", tags:["garbanzos","arroz","verduras"]},
+        {texto:"Lentejas con camote y ensalada.", tags:["lentejas","camote","verduras"]},
+        {texto:"Bowl de frijoles, arroz, aguacate y verduras.", tags:["frijoles","arroz","aguacate","verduras"]},
+        {texto:"Fajitas de pollo con pimientos y tortillas.", tags:["pollo","verduras","tortilla"]},
+        {texto:"Ensalada de huevo con papa y verduras.", tags:["huevo","papa","verduras"]}
     ];
 
     const menuCena = [
@@ -943,8 +1102,108 @@
         {texto:"Tacos de pollo con verduras.", tags:["pollo","tortilla","verduras"]},
         {texto:"Lentejas con verduras y tortillas.", tags:["lentejas","verduras","tortilla"]},
         {texto:"Frijoles con queso, verduras y tortillas.", tags:["frijoles","queso","verduras","tortilla"]},
-        {texto:"Papa con huevo y verduras.", tags:["papa","huevo","verduras"]}
+        {texto:"Papa con huevo y verduras.", tags:["papa","huevo","verduras"]},
+        {texto:"Ensalada de pollo con aguacate y jitomate.", tags:["pollo","aguacate","jitomate","verduras"]},
+        {texto:"Sopa de lentejas con verduras.", tags:["lentejas","verduras"]},
+        {texto:"Tacos de pescado con pepino y col.", tags:["pescado","tortilla","pepino","verduras"]},
+        {texto:"Omelette de espinaca con queso.", tags:["huevo","espinaca","queso"]},
+        {texto:"Tostadas de garbanzos con verduras.", tags:["garbanzos","tortilla","verduras"]},
+        {texto:"Quesadillas de champiñones y queso.", tags:["queso","tortilla","verduras"]},
+        {texto:"Ensalada de atún con aguacate.", tags:["atun","aguacate","verduras"]},
+        {texto:"Frijoles de olla con nopales y tortillas.", tags:["frijoles","nopales","tortilla"]},
+        {texto:"Sándwich integral de huevo y espinaca.", tags:["pan","huevo","espinaca"]}
     ];
+
+    /* =====================================================
+       HIDRATACIÓN
+       NURA incluye una bebida sugerida en cada comida.
+       El agua es la opción principal; otras bebidas aparecen
+       como alternativas para mantener variedad.
+    ===================================================== */
+
+    const bebidasPreferencia = [
+        ["agua", "💧 Agua simple"],
+        ["aguaSabor", "🍋 Agua de sabor"],
+        ["cafe", "☕ Café"],
+        ["te", "🍵 Té"],
+        ["leche", "🥛 Leche"],
+        ["mineral", "🫧 Agua mineral"],
+        ["zero", "🥤 Refresco sin azúcar"],
+        ["jugo", "🧃 Jugo" ]
+    ];
+
+    function toggleBebidaPreferida(valor) {
+        if (!Array.isArray(datosNura.bebidasPreferidas)) datosNura.bebidasPreferidas = [];
+        const yaSeleccionada = datosNura.bebidasPreferidas.includes(valor);
+        datosNura.bebidasPreferidas = yaSeleccionada
+            ? datosNura.bebidasPreferidas.filter(x => x !== valor)
+            : [...datosNura.bebidasPreferidas, valor];
+
+        // Actualiza visualmente el botón sin volver a dibujar todo el paso.
+        // Así el clic no pierde el foco ni interrumpe la selección del usuario.
+        const botones = document.querySelectorAll(".preferencias-bebidas .alimento-btn");
+        botones.forEach(boton => {
+            const onclick = boton.getAttribute("onclick") || "";
+            const coincide = onclick.includes("toggleBebidaPreferida('" + valor + "')");
+            if (coincide) {
+                const seleccionado = datosNura.bebidasPreferidas.includes(valor);
+                boton.classList.toggle("seleccionado", seleccionado);
+                boton.setAttribute("aria-pressed", seleccionado ? "true" : "false");
+            }
+        });
+    }
+
+    const bebidasDesayuno = [
+        "💧 Agua simple", "☕ Café", "🍵 Té sin azúcar", "💧 Agua de sabor sin azúcar", "🥛 Leche", "🫧 Agua mineral"
+    ];
+
+    const bebidasComida = [
+        "💧 Agua simple",
+        "💧 Agua de sabor sin azúcar",
+        "🥤 Refresco sin azúcar / zero",
+        "🥤 Refresco normal (ocasional)",
+        "🍵 Té sin azúcar", "🫧 Agua mineral", "🧃 Jugo (porción moderada)"
+    ];
+
+    const bebidasCena = [
+        "💧 Agua simple",
+        "💧 Agua de sabor sin azúcar",
+        "🍵 Té sin azúcar",
+        "🥤 Refresco sin azúcar / zero",
+        "🥤 Refresco normal (ocasional)", "🫧 Agua mineral", "🥛 Leche"
+    ];
+
+    function obtenerBebida(lista, usados) {
+        const prefs = datosNura.bebidasPreferidas || [];
+        const mapaBebidas = {agua:"agua simple", aguaSabor:"agua de sabor", cafe:"café", te:"té", leche:"leche", mineral:"agua mineral", zero:"refresco sin azúcar", jugo:"jugo"};
+        const filtradas = prefs.length ? lista.filter(item => prefs.some(pref => item.toLowerCase().includes(mapaBebidas[pref] || pref))) : lista;
+        const base = filtradas.length ? filtradas : lista;
+        const noUsadas = base.filter(item => !usados.includes(item));
+        const pool = noUsadas.length ? noUsadas : base;
+        const elegida = pool[Math.floor(Math.random() * pool.length)];
+        usados.push(elegida);
+        return elegida;
+    }
+
+    function obtenerBebidaPorTipo(tipo) {
+        if (tipo === "desayuno") return bebidasDesayuno;
+        if (tipo === "comida") return bebidasComida;
+        return bebidasCena;
+    }
+
+    function cambiarBebida(indice, tipo) {
+        const dia = planSemanalActual[indice];
+        if (!dia) return;
+        const lista = obtenerBebidaPorTipo(tipo);
+        const actual = dia[`bebida${tipo.charAt(0).toUpperCase()}${tipo.slice(1)}`];
+        const opciones = lista.filter(item => item !== actual);
+        if (!opciones.length) return;
+        dia[`bebida${tipo.charAt(0).toUpperCase()}${tipo.slice(1)}`] = opciones[Math.floor(Math.random() * opciones.length)];
+        try { localStorage.setItem("nuraPlanSemanal", JSON.stringify(planSemanalActual)); } catch (e) {}
+        mostrarPlanSemanal(planSemanalActual);
+    }
+
+    let planSemanalActual = [];
 
     const maquinasPreparacion = [
         ["caminadora", "🚶 Caminadora"],
@@ -1362,6 +1621,16 @@ function mostrarPortada() {
                         type="text"
                         placeholder="Escribe tu nombre"
                         value="${datosNura.nombre}">
+
+                    <div style="margin-top:22px;">
+                        <h3 style="margin-bottom:8px;">¿Qué quieres de NURA?</h3>
+                        <p>Elige cómo quieres usar NURA. Puedes cambiar esta decisión más adelante.</p>
+                        <div class="opciones">
+                            ${crearOpcion("planTipo", "alimentacion", "🍽️ Solo alimentación", "Quiero únicamente mi plan de alimentación y bebidas.")}
+                            ${crearOpcion("planTipo", "gym", "🏋️ Solo entrenamiento", "Quiero únicamente mi plan de gimnasio.")}
+                            ${crearOpcion("planTipo", "ambos", "✨ Alimentación + entrenamiento", "Quiero que NURA prepare ambos planes para mí.")}
+                        </div>
+                    </div>
                 </div>
             `;
         }
@@ -1674,6 +1943,16 @@ function mostrarPortada() {
                         </div>
                     </div>
 
+                    <div class="alimentos-evitar preferencias-bebidas">
+                        <strong>🥤 ¿Qué bebidas prefieres?</strong>
+                        <small>Marca las que sí tomas. NURA priorizará estas opciones cuando prepare tu menú.</small>
+                        <div class="alimentos-grid">
+                            ${bebidasPreferencia.map(bebida => `
+                                <button type="button" class="alimento-btn ${datosNura.bebidasPreferidas.includes(bebida[0]) ? "seleccionado" : ""}" aria-pressed="${datosNura.bebidasPreferidas.includes(bebida[0]) ? "true" : "false"}" onclick="toggleBebidaPreferida('${bebida[0]}')">${bebida[1]}</button>
+                            `).join("")}
+                        </div>
+                    </div>
+
                 </div>
             `;
         }
@@ -1847,6 +2126,44 @@ function mostrarPortada() {
     }
 
 
+    function requiereAlimentacion() {
+        return datosNura.planTipo === "alimentacion" || datosNura.planTipo === "ambos";
+    }
+
+    function requiereGym() {
+        return datosNura.planTipo === "gym" || datosNura.planTipo === "ambos";
+    }
+
+    function pasoEsRelevante(numero) {
+        if (numero === 8) return requiereGym();
+        if (numero === 10 || numero === 11) return requiereAlimentacion();
+        if (numero === 12) return requiereGym();
+        return true;
+    }
+
+    function buscarSiguientePaso(desde) {
+        for (let i = desde + 1; i <= 12; i++) {
+            if (pasoEsRelevante(i)) return i;
+        }
+        return 13;
+    }
+
+    function buscarPasoAnterior(desde) {
+        for (let i = desde - 1; i >= 1; i--) {
+            if (pasoEsRelevante(i)) return i;
+        }
+        return 1;
+    }
+
+    function obtenerPasosRelevantes() {
+        const pasos = [];
+        for (let i = 1; i <= 12; i++) {
+            if (pasoEsRelevante(i)) pasos.push(i);
+        }
+        return pasos;
+    }
+
+
     function guardarPaso() {
 
         if (pasoActual === 1) {
@@ -1904,6 +2221,13 @@ function mostrarPortada() {
             return false;
         }
 
+        if (pasoActual === 1 && !datosNura.planTipo) {
+
+            alert("Elige si quieres alimentación, entrenamiento o ambos.");
+
+            return false;
+        }
+
 
         if (pasoActual === 2 && !datosNura.voz) {
 
@@ -1953,7 +2277,7 @@ function mostrarPortada() {
         }
 
 
-        if (pasoActual === 8 && !datosNura.experiencia) {
+        if (pasoActual === 8 && requiereGym() && !datosNura.experiencia) {
 
             alert("Selecciona tu experiencia.");
 
@@ -1969,7 +2293,7 @@ function mostrarPortada() {
         }
 
 
-        if (pasoActual === 10 && !datosNura.alimentacion) {
+        if (pasoActual === 10 && requiereAlimentacion() && !datosNura.alimentacion) {
 
             alert("Selecciona tu preferencia alimentaria.");
 
@@ -1977,7 +2301,7 @@ function mostrarPortada() {
         }
 
 
-        if (pasoActual === 11 && datosNura.alimentosIncluidos.length < 3) {
+        if (pasoActual === 11 && requiereAlimentacion() && datosNura.alimentosIncluidos.length < 3) {
 
             alert("Selecciona al menos 3 alimentos que te gustaría incluir.");
 
@@ -1985,7 +2309,7 @@ function mostrarPortada() {
         }
 
 
-        if (pasoActual === 12 && datosNura.dias.length === 0) {
+        if (pasoActual === 12 && requiereGym() && datosNura.dias.length === 0) {
 
             alert("Selecciona al menos un día para entrenar.");
 
@@ -2005,14 +2329,12 @@ function mostrarPortada() {
             return;
         }
 
-        if (pasoActual < 12) {
+        const siguiente = buscarSiguientePaso(pasoActual);
 
-            pasoActual++;
-
+        if (siguiente <= 12) {
+            pasoActual = siguiente;
             actualizarPaso();
-
         } else {
-
             generarPlan();
         }
     }
@@ -2022,10 +2344,10 @@ function mostrarPortada() {
 
         guardarPaso();
 
+        const anterior = buscarPasoAnterior(pasoActual);
+
         if (pasoActual > 1) {
-
-            pasoActual--;
-
+            pasoActual = anterior;
             actualizarPaso();
         }
     }
@@ -2037,13 +2359,19 @@ function mostrarPortada() {
             paso.classList.remove("activo");
         });
 
+        if (!pasoEsRelevante(pasoActual)) {
+            pasoActual = buscarSiguientePaso(pasoActual) <= 12 ? buscarSiguientePaso(pasoActual) : 1;
+        }
+
         const paso = document.getElementById(`paso${pasoActual}`);
 
         if (paso) {
             paso.classList.add("activo");
         }
 
-        const porcentaje = (pasoActual / 12) * 100;
+        const pasos = obtenerPasosRelevantes();
+        const posicion = Math.max(0, pasos.indexOf(pasoActual));
+        const porcentaje = ((posicion + 1) / pasos.length) * 100;
 
         const barra = document.getElementById("progresoBarra");
 
@@ -2054,18 +2382,13 @@ function mostrarPortada() {
         const anterior = document.getElementById("btnAnterior");
 
         if (anterior) {
-            anterior.style.visibility =
-                pasoActual === 1 ? "hidden" : "visible";
+            anterior.style.visibility = pasoActual === pasos[0] ? "hidden" : "visible";
         }
 
         const siguiente = document.getElementById("btnSiguiente");
 
         if (siguiente) {
-
-            siguiente.textContent =
-                pasoActual === 12
-                    ? "Crear mi plan →"
-                    : "Siguiente";
+            siguiente.textContent = posicion === pasos.length - 1 ? "Crear mi plan →" : "Siguiente";
         }
 
         if (pasoActual === 12) {
@@ -2119,6 +2442,9 @@ function mostrarPortada() {
         const usadosDesayuno = [];
         const usadosComida = [];
         const usadosCena = [];
+        const usadosBebidaDesayuno = [];
+        const usadosBebidaComida = [];
+        const usadosBebidaCena = [];
 
         const semana = diasSemana.map(dia => {
 
@@ -2135,12 +2461,16 @@ function mostrarPortada() {
                 dia,
                 entrenar,
                 sesion: letraSesion,
-                desayuno: obtenerMenuSemana(menuDesayuno, usadosDesayuno),
-                comida: obtenerMenuSemana(menuComida, usadosComida),
-                cena: obtenerMenuSemana(menuCena, usadosCena)
+                desayuno: requiereAlimentacion() ? obtenerMenuSemana(menuDesayuno, usadosDesayuno) : null,
+                bebidaDesayuno: requiereAlimentacion() ? obtenerBebida(bebidasDesayuno, usadosBebidaDesayuno) : null,
+                comida: requiereAlimentacion() ? obtenerMenuSemana(menuComida, usadosComida) : null,
+                bebidaComida: requiereAlimentacion() ? obtenerBebida(bebidasComida, usadosBebidaComida) : null,
+                cena: requiereAlimentacion() ? obtenerMenuSemana(menuCena, usadosCena) : null,
+                bebidaCena: requiereAlimentacion() ? obtenerBebida(bebidasCena, usadosBebidaCena) : null
             };
         });
 
+        planSemanalActual = semana;
         mostrarPlanSemanal(semana);
     }
 
@@ -2163,6 +2493,7 @@ function mostrarPortada() {
                         <p>
                             Tu plan semanal personalizado
                         </p>
+                        <p class="subtitulo-catalogo">🍽️ Catálogo ampliado de platillos · Usa «Cambiar» en cualquier comida para explorar otra opción compatible con tus preferencias.</p>
 
                     </div>
 
@@ -2174,9 +2505,11 @@ function mostrarPortada() {
                         </h2>
 
                         <p>
-                            NURA preparó tu semana completa.
-                            Tendrás alimentación todos los días
-                            y entrenamiento en los días que elegiste.
+                            ${datosNura.planTipo === "alimentacion"
+                                ? "NURA preparó tu plan de alimentación y bebidas para toda la semana."
+                                : datosNura.planTipo === "gym"
+                                    ? "NURA preparó tu plan de entrenamiento para los días que elegiste."
+                                    : "NURA preparó tu semana completa de alimentación, bebidas y entrenamiento."}
                         </p>
 
                     </div>
@@ -2349,12 +2682,16 @@ function mostrarPortada() {
                     <span class="${badgeClase}">${etiqueta}</span>
                 </div>
 
+                ${requiereAlimentacion() ? `
                 <div class="comida">
                     <div class="comida-header">
                         <strong>🍳 Desayuno</strong>
                         <button class="btn-cambiar" onclick="cambiarComida(${indice}, 'desayuno')">🔄 Cambiar</button>
                     </div>
                     <div id="desayuno-${indice}" class="comida-texto">${dia.desayuno}</div>
+                    <div class="bebida-box">💧 <strong>Bebida:</strong> <span id="bebidaDesayuno-${indice}">${dia.bebidaDesayuno || "💧 Agua simple"}</span>
+                        <button class="bebida-accion" onclick="cambiarBebida(${indice}, 'desayuno')">Cambiar</button>
+                    </div>
                 </div>
 
                 <div class="comida">
@@ -2363,6 +2700,9 @@ function mostrarPortada() {
                         <button class="btn-cambiar" onclick="cambiarComida(${indice}, 'comida')">🔄 Cambiar</button>
                     </div>
                     <div id="comida-${indice}" class="comida-texto">${dia.comida}</div>
+                    <div class="bebida-box">💧 <strong>Bebida:</strong> <span id="bebidaComida-${indice}">${dia.bebidaComida || "💧 Agua simple"}</span>
+                        <button class="bebida-accion" onclick="cambiarBebida(${indice}, 'comida')">Cambiar</button>
+                    </div>
                 </div>
 
                 <div class="comida">
@@ -2371,9 +2711,13 @@ function mostrarPortada() {
                         <button class="btn-cambiar" onclick="cambiarComida(${indice}, 'cena')">🔄 Cambiar</button>
                     </div>
                     <div id="cena-${indice}" class="comida-texto">${dia.cena}</div>
+                    <div class="bebida-box">💧 <strong>Bebida:</strong> <span id="bebidaCena-${indice}">${dia.bebidaCena || "💧 Agua simple"}</span>
+                        <button class="bebida-accion" onclick="cambiarBebida(${indice}, 'cena')">Cambiar</button>
+                    </div>
                 </div>
+                ` : ""}
 
-                ${dia.entrenar ? `
+                ${dia.entrenar && requiereGym() ? `
                     <div class="entrenamiento">
                         <h4>🏋️ Sesión ${dia.sesion}: ${rutina.nombre}</h4>
 
@@ -2405,13 +2749,13 @@ function mostrarPortada() {
 
                         <button class="boton-entrenar" onclick="iniciarEntrenamiento('${dia.sesion}', ${indice})">▶️ Empezar sesión</button>
                     </div>
-                ` : `
+                ` : (requiereGym() ? `
                     <div class="descanso">
                         <strong>🌿 Día de recuperación</strong>
                         <br><br>
-                        Hoy no tienes entrenamiento. Mantén tus tres comidas normales, hidrátate y aprovecha el día para recuperarte y moverte de forma cómoda.
+                        Hoy no tienes entrenamiento. Mantén tus comidas normales, hidrátate y aprovecha el día para recuperarte y moverte de forma cómoda.
                     </div>
-                `}
+                ` : "")}
             </div>
         `;
     }
@@ -3357,11 +3701,684 @@ function mostrarPortada() {
        VOZ / FUTURO ASISTENTE
     ===================================================== */
 
-    function hablarConNura() {
+    let reconocimientoNura = null;
+    let escuchandoNura = false;
+    let vozActivaNura = false;
+    let vozHablandoNura = false;
+    let reinicioVozNura = null;
+    let saludoInicialNura = false;
 
-        alert(
-            "🎙️ La conversación por voz con NURA será una de las próximas funciones. Aquí podremos conectar la voz y el asistente inteligente más adelante."
-        );
+    function obtenerVozNura() {
+        if (!("speechSynthesis" in window)) return null;
+
+        const voces = window.speechSynthesis.getVoices();
+        const esMX = voces.filter(v => /^es-MX/i.test(v.lang));
+        const espanolas = voces.filter(v => /^es(-|_)/i.test(v.lang));
+        const disponibles = esMX.length ? esMX : (espanolas.length ? espanolas : voces);
+        const preferencia = datosNura.voz || "femenina";
+
+        const femeninas = /dalia.*(online|natural)|dalia|ximena.*(online|natural)|ximena|valeria.*(online|natural)|valeria|beatriz|candela|carlota|larissa|nuria|renata|sabina|helena|elena|paulina|monica|mónica|sofia|sofía|female|femenina|mujer|woman|google español|spanish.*female/i;
+        const masculinas = /jorge|tristan|alejo|pablo|diego|raul|raúl|carlos|male|masculina|hombre|man|spanish.*male/i;
+
+        if (preferencia === "femenina") {
+            return disponibles.find(v => /microsoft.*dalia.*(natural|online)|dalia.*(natural|online)/i.test(v.name)) ||
+                   disponibles.find(v => /microsoft.*ximena.*(natural|online)|ximena.*(natural|online)/i.test(v.name)) ||
+                   disponibles.find(v => /microsoft.*valeria.*(natural|online)|valeria.*(natural|online)/i.test(v.name)) ||
+                   disponibles.find(v => femeninas.test(v.name)) ||
+                   disponibles.find(v => !masculinas.test(v.name)) || disponibles[0] || null;
+        }
+
+        if (preferencia === "masculina") {
+            return disponibles.find(v => masculinas.test(v.name)) || disponibles.find(v => !femeninas.test(v.name)) || disponibles[0] || null;
+        }
+
+        return disponibles.find(v => !masculinas.test(v.name)) || disponibles[0] || null;
+    }
+
+    function actualizarEstadoVozNura(texto) {
+        const estado = document.getElementById("estadoVozNura");
+        if (estado) estado.textContent = texto;
+    }
+
+    function programarEscuchaNura() {
+        if (!vozActivaNura || !reconocimientoNura || vozHablandoNura) return;
+        clearTimeout(reinicioVozNura);
+        reinicioVozNura = setTimeout(() => {
+            if (!vozActivaNura || escuchandoNura || vozHablandoNura) return;
+            try { reconocimientoNura.start(); } catch (e) {}
+        }, 350);
+    }
+
+    function hablarConNura() {
+        saludoInicialNura = false;
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        document.body.insertAdjacentHTML("beforeend", `
+            <div class="voz-panel" id="panelVozNura" onclick="cerrarVozNura(event)">
+                <div class="voz-card" onclick="event.stopPropagation()">
+                    <div class="logo">NURA</div>
+                    <div class="voz-orb" id="orbVozNura">🎙️</div>
+                    <h2>Habla con NURA</h2>
+                    <div class="voz-estado" id="estadoVozNura">Activa la conversación una sola vez y después habla con NURA con naturalidad.</div>
+                    <div class="voz-transcripcion" id="textoVozNura">Aquí aparecerá lo que NURA entienda.</div>
+                    <button id="btnVozNura" class="btn-principal" onclick="alternarEscuchaNura()">🎙️ Activar conversación</button>
+                    <button class="btn-siguiente" style="margin-top:10px;width:100%;" onclick="cerrarVozNura()">Cerrar</button>
+                    <div class="voz-ayuda">Después de activarla, NURA vuelve a escucharte automáticamente después de cada respuesta. No tendrás que pulsar el botón en cada turno.</div>
+                </div>
+            </div>
+        `);
+
+        if (!SpeechRecognition) {
+            actualizarEstadoVozNura("Este navegador no permite reconocimiento de voz aquí. Prueba con Chrome o Edge en un dispositivo compatible.");
+            document.getElementById("orbVozNura").textContent = "ℹ️";
+            return;
+        }
+
+        reconocimientoNura = new SpeechRecognition();
+        reconocimientoNura.lang = "es-MX";
+        reconocimientoNura.continuous = true;
+        reconocimientoNura.interimResults = false;
+        reconocimientoNura.maxAlternatives = 1;
+
+        reconocimientoNura.onstart = () => {
+            escuchandoNura = true;
+            actualizarEstadoVozNura("Te escucho… habla con naturalidad.");
+            const orb = document.getElementById("orbVozNura");
+            if (orb) orb.classList.add("escuchando");
+        };
+
+        reconocimientoNura.onresult = (event) => {
+            let texto = "";
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                if (event.results[i].isFinal) texto += event.results[i][0].transcript + " ";
+            }
+            texto = texto.trim();
+            if (!texto) return;
+
+            const caja = document.getElementById("textoVozNura");
+            if (caja) caja.textContent = texto;
+            responderVozNura(texto);
+        };
+
+        reconocimientoNura.onerror = (event) => {
+            escuchandoNura = false;
+            const orb = document.getElementById("orbVozNura");
+            if (orb) orb.classList.remove("escuchando");
+
+            if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+                vozActivaNura = false;
+                actualizarEstadoVozNura("Necesito permiso para usar el micrófono. Puedes activarlo desde los permisos del navegador.");
+                const boton = document.getElementById("btnVozNura");
+                if (boton) boton.textContent = "🎙️ Activar conversación";
+                return;
+            }
+
+            if (vozActivaNura && !vozHablandoNura) {
+                actualizarEstadoVozNura("Sigo aquí. Te escucho…");
+                programarEscuchaNura();
+            }
+        };
+
+        reconocimientoNura.onend = () => {
+            escuchandoNura = false;
+            const orb = document.getElementById("orbVozNura");
+            if (orb) orb.classList.remove("escuchando");
+            if (vozActivaNura && !vozHablandoNura) programarEscuchaNura();
+        };
+
+        if ("speechSynthesis" in window) {
+            window.speechSynthesis.onvoiceschanged = () => {};
+            window.speechSynthesis.getVoices();
+        }
+    }
+
+    function alternarEscuchaNura() {
+        if (!reconocimientoNura) return;
+
+        if (vozActivaNura) {
+            vozActivaNura = false;
+            clearTimeout(reinicioVozNura);
+            if (escuchandoNura) {
+                try { reconocimientoNura.stop(); } catch (e) {}
+            }
+            actualizarEstadoVozNura("Conversación pausada.");
+            const boton = document.getElementById("btnVozNura");
+            if (boton) boton.textContent = "🎙️ Activar conversación";
+            return;
+        }
+
+        vozActivaNura = true;
+        const boton = document.getElementById("btnVozNura");
+        if (boton) boton.textContent = "⏸️ Pausar conversación";
+
+        const iniciarEscuchaDespuesDelSaludo = () => {
+            if (!vozActivaNura) return;
+            actualizarEstadoVozNura("Te escucho…");
+            try {
+                reconocimientoNura.start();
+            } catch (e) {
+                programarEscuchaNura();
+            }
+        };
+
+        if (!saludoInicialNura) {
+            saludoInicialNura = true;
+            const nombre = datosNura.nombre || "amigo";
+            const saludos = [
+                `Hola ${nombre}, ¿cómo has estado? ¿Qué tal tu día? Dime, ¿qué indicaciones tienes para mí o en qué puedo ayudarte hoy?`,
+                `Hola ${nombre}. Qué gusto escucharte. ¿Cómo va tu día? Cuéntame, ¿qué necesitas de NURA?`,
+                `Hola ${nombre}, aquí estoy. ¿Cómo estás? Dime qué tienes en mente y vemos juntos en qué puedo ayudarte.`,
+                `Hola ${nombre}. Ya estoy lista para escucharte. ¿Qué te gustaría hacer hoy con NURA?`
+            ];
+            const saludo = saludos[Math.floor(Math.random() * saludos.length)];
+            actualizarEstadoVozNura(saludo);
+            hablarTextoNaturalNura(saludo, iniciarEscuchaDespuesDelSaludo);
+        } else {
+            iniciarEscuchaDespuesDelSaludo();
+        }
+    }
+
+    function obtenerDiaSolicitadoVoz(texto) {
+        const t = texto.toLowerCase();
+        const equivalencias = {
+            "lunes": "Lunes",
+            "martes": "Martes",
+            "miércoles": "Miércoles",
+            "miercoles": "Miércoles",
+            "jueves": "Jueves",
+            "viernes": "Viernes",
+            "sábado": "Sábado",
+            "sabado": "Sábado",
+            "domingo": "Domingo"
+        };
+
+        for (const clave in equivalencias) {
+            if (t.includes(clave)) return equivalencias[clave];
+        }
+
+        const hoy = diasSemana[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
+        if (t.includes("hoy")) return hoy;
+
+        return hoy;
+    }
+
+    /* =====================================================
+       CONVERSACIÓN DE ALIMENTACIÓN Y SUSTITUCIONES
+    ===================================================== */
+
+    const sustitucionesAlimentos = {
+        pollo: ["huevo", "carne", "atún"],
+        carne: ["pollo", "huevo", "atún"],
+        pescado: ["pollo", "huevo", "atún"],
+        atun: ["huevo", "pollo", "pescado"],
+        salmón: ["pescado", "pollo", "huevo"],
+        huevo: ["pollo", "atún", "carne"],
+        queso: ["huevo", "yogur", "frijoles"],
+        leche: ["yogur", "leche vegetal", "agua"],
+        frijoles: ["lentejas", "garbanzos", "huevo"],
+        lentejas: ["frijoles", "garbanzos", "huevo"],
+        arroz: ["papa", "pasta", "tortilla"],
+        avena: ["pan", "tortilla", "yogur"],
+        tortilla: ["papa", "arroz", "pan"],
+        pan: ["tortilla", "avena", "papa"],
+        pasta: ["arroz", "papa", "tortilla"],
+        papa: ["arroz", "pasta", "tortilla"],
+        verduras: ["verduras disponibles", "ensalada", "otra verdura"],
+        frutas: ["otra fruta", "yogur", "avena"],
+        aguacate: ["nueces y semillas", "aceite de oliva", "otra grasa disponible"],
+        nueces: ["aguacate", "semillas", "otra grasa disponible"],
+        yogur: ["leche", "queso", "huevo"],
+        tostadas: ["tortilla", "pan", "papa"],
+        tostada: ["tortilla", "pan", "papa"],
+        verduras: [],
+        jamon: ["huevo", "queso", "frijoles"],
+        salchicha: ["huevo", "frijoles", "queso"],
+        champiñones: ["huevo", "queso", "frijoles"]
+    };
+
+    const nombresAlimentosNura = {
+        "pollo": "pollo", "carne": "carne", "pescado": "pescado", "atun": "atún", "salmón": "salmón",
+        "huevo": "huevo", "queso": "queso", "leche": "leche", "frijoles": "frijoles", "lentejas": "lentejas",
+        "arroz": "arroz", "avena": "avena", "tortilla": "tortilla", "pan": "pan", "pasta": "pasta", "papa": "papa",
+        "verduras": "verduras", "frutas": "frutas", "aguacate": "aguacate", "nueces": "nueces", "yogur": "yogur", "tostadas": "tostadas", "tostada": "tostadas",
+        "jamon": "jamón", "salchicha": "salchicha", "pavo": "pavo", "cerdo": "cerdo", "camaron": "camarón", "sardina": "sardina", "tofu": "tofu",
+        "champiñones": "champiñones", "pimiento": "pimiento", "cebolla": "cebolla", "col": "col", "lechuga": "lechuga", "chayote": "chayote", "elote": "elote",
+        "manzana": "manzana", "platano": "plátano", "pera": "pera", "mango": "mango", "uva": "uvas", "bolillo": "bolillo", "galletas": "galletas saladas"
+    };
+
+    function extraerElementoNoDisponible(texto) {
+        const t = normalizarAlimentoNura(texto);
+        const patrones = [
+            /ya\s+no\s+tengo\s+([^,.!?]+)/i,
+            /no\s+cuento\s+con\s+([^,.!?]+)/i,
+            /no\s+tengo\s+([^,.!?]+)/i,
+            /no\s+hay\s+([^,.!?]+)/i,
+            /se\s+me\s+acabo\s+([^,.!?]+)/i
+        ];
+        for (const patron of patrones) {
+            const m = t.match(patron);
+            if (m) return m[1].trim();
+        }
+        return "";
+    }
+
+    function detectarAlimentoNoDisponible(texto) {
+        const frase = extraerElementoNoDisponible(texto);
+        for (const clave of Object.keys(nombresAlimentosNura)) {
+            if (frase.includes(normalizarAlimentoNura(clave))) return clave;
+        }
+        return null;
+    }
+
+    const bebidasNura = [
+        { claves:["agua simple","agua"], valor:"💧 Agua simple" },
+        { claves:["agua de sabor","agua fresca"], valor:"💧 Agua de sabor sin azúcar" },
+        { claves:["cafe","café"], valor:"☕ Café" },
+        { claves:["te","té","te sin azucar","té sin azúcar"], valor:"🍵 Té sin azúcar" },
+        { claves:["refresco zero","zero","refresco sin azucar","refresco sin azúcar","refresco de dieta"], valor:"🥤 Refresco sin azúcar / zero" },
+        { claves:["refresco normal","refresco"], valor:"🥤 Refresco normal (ocasional)" }
+    ];
+
+    function detectarBebidaEnTexto(texto) {
+        const t = normalizarAlimentoNura(texto);
+        // Priorizar frases específicas antes de términos generales como "agua" o "refresco".
+        const orden = [...bebidasNura].sort((a,b) => Math.max(...b.claves.map(x=>x.length))-Math.max(...a.claves.map(x=>x.length)));
+        for (const bebida of orden) {
+            if (bebida.claves.some(clave => t.includes(normalizarAlimentoNura(clave)))) return bebida;
+        }
+        return null;
+    }
+
+    function aplicarCambioBebidaPendiente(texto) {
+        const pendiente = window.__nuraPendienteBebida;
+        if (!pendiente) return null;
+        const bebida = detectarBebidaEnTexto(texto);
+        if (!bebida) return "Perfecto, dime qué bebida tienes disponible: agua simple, agua de sabor, café, té u otra bebida.";
+        const dia = planSemanalActual.find(d => d.dia === pendiente.dia);
+        if (!dia) { window.__nuraPendienteBebida = null; return "No encontré ese día en tu plan. Dime qué día quieres ajustar."; }
+        const campo = `bebida${pendiente.tipo.charAt(0).toUpperCase()}${pendiente.tipo.slice(1)}`;
+        dia[campo] = bebida.valor;
+        window.__nuraPendienteBebida = null;
+        try { localStorage.setItem("nuraPlanSemanal", JSON.stringify(planSemanalActual)); } catch (e) {}
+        mostrarPlanSemanal(planSemanalActual);
+        return `Listo. Cambié la bebida del ${pendiente.tipo} del ${dia.dia} por ${bebida.valor}. El resto del menú se queda igual.`;
+    }
+
+    function alimentoPermitidoParaSustitucion(nombre) {
+        const mapa = {
+            "pollo":"pollo", "carne":"carne", "pescado":"pescado", "atún":"atun", "huevo":"huevo",
+            "queso":"queso", "leche":"leche", "frijoles":"frijoles", "lentejas":"lentejas", "arroz":"arroz",
+            "avena":"avena", "tortilla":"tortilla", "pan":"pan", "pasta":"pasta", "papa":"papa",
+            "verduras":"verduras", "frutas":"frutas", "aguacate":"aguacate", "nueces y semillas":"nueces", "yogur":"yogur", "tostadas":"tostadas"
+        };
+        const clave = mapa[nombre] || nombre;
+        return !(datosNura.alimentosEvitar || []).includes(clave);
+    }
+
+    function normalizarAlimentoNura(texto) {
+        return (texto || "")
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .trim();
+    }
+
+    function alimentosMencionadosEnTexto(texto) {
+        const t = normalizarAlimentoNura(texto);
+        const equivalencias = [
+            ["jamon", "jamón"], ["salchicha", "salchicha"], ["huevo", "huevo"], ["huevos", "huevo"],
+            ["queso", "queso"], ["pollo", "pollo"], ["carne", "carne"], ["atun", "atún"], ["pescado", "pescado"],
+            ["frijoles", "frijoles"], ["lentejas", "lentejas"], ["arroz", "arroz"], ["tortillas", "tortillas"], ["tortilla", "tortillas"],
+            ["pan", "pan"], ["bolillo", "bolillo"], ["papa", "papa"], ["pasta", "pasta"], ["avena", "avena"],
+            ["leche", "leche"], ["yogur", "yogur"], ["aguacate", "aguacate"], ["jitomate", "jitomate"], ["tomate", "tomate"],
+            ["cebolla", "cebolla"], ["champiñones", "champiñones"], ["champinones", "champiñones"], ["espinaca", "espinaca"],
+            ["nopales", "nopales"], ["pepino", "pepino"], ["zanahoria", "zanahoria"], ["lechuga", "lechuga"], ["manzana", "manzana"],
+            ["platano", "plátano"], ["platano", "plátano"], ["fruta", "fruta"], ["verduras", "verduras"], ["salmon", "salmón"],
+            ["pavo", "pavo"], ["cerdo", "cerdo"], ["camaron", "camarón"], ["sardina", "sardina"], ["tofu", "tofu"],
+            ["galletas", "galletas saladas"], ["tostadas", "tostadas"], ["crema", "crema"], ["mayonesa", "mayonesa"]
+        ];
+        const encontrados = [];
+        for (const [clave, nombre] of equivalencias) {
+            if (t.includes(clave) && !encontrados.includes(nombre)) encontrados.push(nombre);
+        }
+        return encontrados;
+    }
+
+    function alimentoMencionadoEnTexto(texto) {
+        return alimentosMencionadosEnTexto(texto)[0] || null;
+    }
+
+    function buscarSustitutoDisponible(alimento) {
+        const opciones = sustitucionesAlimentos[alimento] || [];
+        const permitidas = opciones.filter(opcion => {
+            const clave = normalizarAlimentoNura(opcion);
+            return !["verduras disponibles","ensalada","otra verdura","otra fruta","otra grasa disponible","aceite de oliva","semillas","leche vegetal","agua","garbanzos"].includes(clave) && alimentoPermitidoParaSustitucion(opcion);
+        });
+        return permitidas[0] || null;
+    }
+
+    function reemplazarAlimentoEnDia(dia, tipo, alimentoNoDisponible, sustituto) {
+        if (!dia || !dia[tipo]) return false;
+        const texto = dia[tipo];
+        const patrones = {
+            atun: /at[uú]n/gi,
+            salmon: /salm[oó]n/gi,
+            tostadas: /tostadas?/gi
+        };
+        const objetivo = patrones[alimentoNoDisponible] || new RegExp(alimentoNoDisponible, "gi");
+        if (!objetivo.test(texto)) return false;
+        objetivo.lastIndex = 0;
+        dia[tipo] = texto.replace(objetivo, sustituto);
+        return true;
+    }
+
+    function aplicarSustitucionEnPlan(alimentoNoDisponible, sustituto) {
+        if (!planSemanalActual.length || !sustituto) return 0;
+        let cambios = 0;
+        const diaObjetivo = obtenerDiaSolicitadoVoz("hoy");
+        const diasObjetivo = planSemanalActual.filter(d => d.dia === diaObjetivo);
+        const revisar = diasObjetivo.length ? diasObjetivo : planSemanalActual;
+        const t = normalizarAlimentoNura(window.__nuraTextoActual || "");
+        let tiposObjetivo = ["desayuno", "comida", "cena"];
+
+        if (t.includes("cena") || t.includes("cenar")) {
+            tiposObjetivo = ["cena"];
+        } else if (t.includes("desayuno") || t.includes("desayunar")) {
+            tiposObjetivo = ["desayuno"];
+        } else if (t.includes("comida") || t.includes("comer") || t.includes("almuerzo")) {
+            tiposObjetivo = ["comida"];
+        }
+
+        revisar.forEach(dia => {
+            tiposObjetivo.forEach(tipo => {
+                if (reemplazarAlimentoEnDia(dia, tipo, alimentoNoDisponible, sustituto)) cambios++;
+            });
+        });
+
+        if (cambios > 0) {
+            try { localStorage.setItem("nuraPlanSemanal", JSON.stringify(planSemanalActual)); } catch (e) {}
+            if (typeof mostrarPlanSemanal === "function") mostrarPlanSemanal(planSemanalActual);
+        }
+        return cambios;
+    }
+
+    function obtenerResumenAlimentacionVoz(texto) {
+        if (!planSemanalActual.length) {
+            return "Todavía no tengo una semana generada para consultarte la alimentación. Primero crea tu plan semanal y después puedes preguntarme qué desayunar, qué comer o qué cenar.";
+        }
+
+        const diaSolicitado = obtenerDiaSolicitadoVoz(texto);
+        const dia = planSemanalActual.find(item => item.dia === diaSolicitado) || planSemanalActual[0];
+        const t = normalizarAlimentoNura(texto);
+        window.__nuraTextoActual = texto;
+
+        // Si NURA estaba esperando que el usuario dijera qué bebida tiene, resolverlo primero.
+        const cambioBebidaPendiente = aplicarCambioBebidaPendiente(texto);
+        if (cambioBebidaPendiente) return cambioBebidaPendiente;
+        // Resolver una sustitución pendiente con los ingredientes que el usuario sí tiene.
+        const pendienteComida = window.__nuraPendienteAlimento;
+        if (pendienteComida) {
+            const disponibles = alimentosMencionadosEnTexto(texto).filter(x => !["verduras", "fruta"].includes(x));
+            if (!disponibles.length) {
+                return "Dime los ingredientes que sí tienes, por ejemplo huevo, jamón, salchicha, queso, tortillas o pan. Con eso te propongo una comida distinta sin repetir toda la semana.";
+            }
+            const diaPendiente = planSemanalActual.find(d => d.dia === pendienteComida.dia);
+            if (!diaPendiente) {
+                window.__nuraPendienteAlimento = null;
+                return "No encontré ese día del menú. Dime qué día quieres ajustar y lo hacemos.";
+            }
+            const tipoPendiente = pendienteComida.tipo || "comida";
+            const ingredientes = disponibles.slice(0, 3);
+            let platillo = "";
+            const tiene = x => ingredientes.some(i => normalizarAlimentoNura(i).includes(normalizarAlimentoNura(x)));
+            if (tiene("huevo") && (tiene("jamón") || tiene("salchicha"))) {
+                const extras = ingredientes.filter(i => i !== "huevo");
+                platillo = `Huevos revueltos con ${extras.join(" y ")}`;
+            } else if (tiene("jamón") && tiene("queso")) {
+                platillo = "Sándwich de jamón y queso";
+            } else if (tiene("salchicha") && tiene("tortillas")) {
+                platillo = "Tacos de salchicha";
+            } else if (tiene("huevo")) {
+                platillo = "Huevos preparados al gusto";
+            } else {
+                platillo = `Platillo sencillo con ${ingredientes.join(" y ")}`;
+            }
+            const campoComida = tipoPendiente;
+            diaPendiente[campoComida] = platillo + ".";
+            window.__nuraPendienteAlimento = null;
+            try { localStorage.setItem("nuraPlanSemanal", JSON.stringify(planSemanalActual)); } catch (e) {}
+            mostrarPlanSemanal(planSemanalActual);
+            return `Perfecto, con lo que tienes te propongo ${platillo.toLowerCase()}. Actualicé únicamente la comida del ${diaPendiente.dia}; el resto de tu menú se conserva.`;
+        }
+
+        const fraseNoDisponible = extraerElementoNoDisponible(texto);
+        const bebidaNoDisponible = detectarBebidaEnTexto(fraseNoDisponible);
+        if (fraseNoDisponible && bebidaNoDisponible) {
+            let tipoBebida = null;
+            if (t.includes("desayuno") || t.includes("desayunar")) tipoBebida = "desayuno";
+            else if (t.includes("comida") || t.includes("comer") || t.includes("almuerzo")) tipoBebida = "comida";
+            else if (t.includes("cena") || t.includes("cenar")) tipoBebida = "cena";
+            else {
+                tipoBebida = ["desayuno","comida","cena"].find(tipo => normalizarAlimentoNura(dia[`bebida${tipo.charAt(0).toUpperCase()}${tipo.slice(1)}`] || "").includes(normalizarAlimentoNura(bebidaNoDisponible.valor.replace(/^\S+\s*/, "")))) || "desayuno";
+            }
+            window.__nuraPendienteBebida = { dia: dia.dia, tipo: tipoBebida };
+            return `No pasa nada. ¿Qué bebidas tienes disponibles? Por ejemplo, agua simple, agua de sabor, café u otra. Cambiaré únicamente la bebida del ${tipoBebida} del ${dia.dia}; tu comida se queda igual.`;
+        }
+
+        const noDisponible = detectarAlimentoNoDisponible(texto);
+
+        if (noDisponible === "verduras" || noDisponible === "frutas") {
+            let tipoPendiente = "comida";
+            if (t.includes("desayuno") || t.includes("desayunar")) tipoPendiente = "desayuno";
+            else if (t.includes("cena") || t.includes("cenar")) tipoPendiente = "cena";
+            else if (t.includes("comida") || t.includes("comer") || t.includes("almuerzo")) tipoPendiente = "comida";
+            window.__nuraPendienteAlimento = { dia: dia.dia, tipo: tipoPendiente, alimento: noDisponible };
+            return `No hay problema. Vamos a cambiar solo esa comida del ${dia.dia}. ¿Qué ingredientes sí tienes a la mano? Puedes decirme varios, como huevo, jamón, salchicha, queso, tortillas o pan.`;
+        }
+
+        if (noDisponible) {
+            const sustituto = buscarSustitutoDisponible(noDisponible);
+            if (sustituto) {
+                const cambios = aplicarSustitucionEnPlan(noDisponible, sustituto);
+                if (cambios) {
+                    return `Claro. No pasa nada. Cambié ${nombresAlimentosNura[noDisponible] || noDisponible} por ${sustituto} en las comidas donde aparecía. Si tampoco tienes ${sustituto}, dime qué alimentos sí tienes y buscamos otra opción.`;
+                }
+                return `No pasa nada. Podemos cambiar ${nombresAlimentosNura[noDisponible] || noDisponible} por ${sustituto}. Si me dices qué alimentos tienes disponibles, te propongo otra opción.`;
+            }
+            return `No quiero inventarte una sustitución. Dime qué alimentos sí tienes disponibles y buscamos juntos una alternativa para esa comida.`;
+        }
+
+        // Si el usuario responde solamente con un alimento disponible, por ejemplo
+        // "tengo huevo", lo usamos como respuesta a una sustitución pendiente.
+        if (t.includes("tengo ") || t.includes("sí tengo ") || t.includes("si tengo ") || t.includes("cuento con ")) {
+            const alimentos = alimentosMencionadosEnTexto(texto);
+            if (alimentos.length) {
+                return `Anotado: tienes ${alimentos.join(", ")}. Dime qué platillo o ingrediente quieres sustituir y ajustaré solo esa comida, sin repetir el menú semanal.`;
+            }
+        }
+
+        const preguntaBebida = t.includes("bebida") || t.includes("tomar") || t.includes("qué tomo") || t.includes("que tomo") || t.includes("qué voy a tomar") || t.includes("que voy a tomar");
+
+        if (preguntaBebida) {
+            if (t.includes("desayuno") || t.includes("desayunar")) return `En el desayuno puedes tomar: ${dia.bebidaDesayuno || "agua simple"}.`;
+            if (t.includes("comida") || t.includes("comer") || t.includes("almuerzo")) return `Con la comida puedes tomar: ${dia.bebidaComida || "agua simple"}.`;
+            if (t.includes("cena") || t.includes("cenar")) return `Con la cena puedes tomar: ${dia.bebidaCena || "agua simple"}.`;
+            return `Hoy NURA te sugiere ${dia.bebidaDesayuno || "agua simple"} en el desayuno, ${dia.bebidaComida || "agua simple"} con la comida y ${dia.bebidaCena || "agua simple"} con la cena.`;
+        }
+
+        if (t.includes("desayuno") || t.includes("desayunar")) {
+            return `Para ${dia.dia}, tu desayuno es: ${dia.desayuno}. Y para tomar, ${dia.bebidaDesayuno || "agua simple"}.`;
+        }
+
+        if (t.includes("cena") || t.includes("cenar")) {
+            return `Para ${dia.dia}, tu cena es: ${dia.cena}. Y para tomar, ${dia.bebidaCena || "agua simple"}.`;
+        }
+
+        if (t.includes("comida") || t.includes("comer") || t.includes("almuerzo")) {
+            return `Para ${dia.dia}, tu comida es: ${dia.comida}. Y para tomar, ${dia.bebidaComida || "agua simple"}.`;
+        }
+
+        return `Para ${dia.dia}, tu alimentación es: desayuno, ${dia.desayuno}; comida, ${dia.comida}; y cena, ${dia.cena}. Para tomar: ${dia.bebidaDesayuno || "agua simple"} en el desayuno, ${dia.bebidaComida || "agua simple"} con la comida y ${dia.bebidaCena || "agua simple"} con la cena.`;
+    }
+
+    function dividirTextoParaHablar(texto) {
+        return texto
+            .replace(/\s+/g, " ")
+            .split(/(?<=[.!?])\s+/)
+            .map(x => x.trim())
+            .filter(Boolean);
+    }
+
+    function hablarTextoNaturalNura(texto, alTerminar) {
+        if (!("speechSynthesis" in window)) {
+            if (alTerminar) alTerminar();
+            return;
+        }
+
+        const partes = dividirTextoParaHablar(texto);
+        let indice = 0;
+        window.speechSynthesis.cancel();
+
+        const siguiente = () => {
+            if (indice >= partes.length) {
+                if (alTerminar) alTerminar();
+                return;
+            }
+
+            const parte = partes[indice++];
+            const voz = new SpeechSynthesisUtterance(parte);
+            voz.lang = "es-MX";
+            voz.rate = 0.86;
+            voz.pitch = 1.0;
+            voz.volume = 1;
+
+            const vozNura = obtenerVozNura();
+            if (vozNura) voz.voice = vozNura;
+
+            voz.onstart = () => {
+                vozHablandoNura = true;
+                if (escuchandoNura && reconocimientoNura) {
+                    try { reconocimientoNura.stop(); } catch (e) {}
+                }
+                const orb = document.getElementById("orbVozNura");
+                if (orb) {
+                    orb.classList.remove("escuchando");
+                    orb.textContent = "🔊";
+                }
+            };
+
+            voz.onend = () => {
+                if (indice < partes.length) {
+                    setTimeout(siguiente, 120);
+                } else {
+                    vozHablandoNura = false;
+                    const orb = document.getElementById("orbVozNura");
+                    if (orb) orb.textContent = "🎙️";
+                    if (alTerminar) alTerminar();
+                }
+            };
+
+            voz.onerror = () => {
+                vozHablandoNura = false;
+                if (alTerminar) alTerminar();
+            };
+
+            window.speechSynthesis.speak(voz);
+        };
+
+        siguiente();
+    }
+
+    // Memoria conversacional de la sesión: conserva los últimos turnos para dar continuidad.
+    window.__nuraConversacion = window.__nuraConversacion || [];
+
+    function guardarTurnoConversacionNura(usuario, asistente) {
+        const historial = window.__nuraConversacion;
+        historial.push({ usuario: String(usuario || "").trim(), asistente: String(asistente || "").trim(), momento: Date.now() });
+        while (historial.length > 12) historial.shift();
+    }
+
+    function responderConversacionGeneralNura(t) {
+        if (/\b(quien eres|qu[eé] eres|para qu[eé] sirves|qu[eé] puedes hacer|c[oó]mo me puedes ayudar)\b/.test(t)) {
+            return "Soy NURA, tu asistente de bienestar. Puedo ayudarte a revisar tu menú, buscar sustituciones con los ingredientes que tienes, consultar tus bebidas, acompañarte con tus entrenamientos y revisar tu progreso. También puedo conversar contigo, aunque para preguntas muy abiertas todavía estoy aprendiendo y no tengo conectado un modelo externo de inteligencia artificial.";
+        }
+        if (/\b(c[oó]mo est[aá]s|qu[eé] tal est[aá]s)\b/.test(t)) {
+            return "¡Aquí estoy, lista para ayudarte! ¿Qué hacemos hoy: revisamos tu comida, buscamos una alternativa con lo que tienes o vemos tu entrenamiento?";
+        }
+        if (/\b(gracias|muchas gracias|te agradezco)\b/.test(t)) {
+            return "¡Con gusto! Para eso estoy. Seguimos paso a paso; dime qué necesitas y lo resolvemos juntas.";
+        }
+        if (/\b(repite|rep[ií]telo|no entend[ií]|qu[eé] dijiste)\b/.test(t)) {
+            const ultimo = window.__nuraConversacion.length > 1 ? window.__nuraConversacion[window.__nuraConversacion.length - 2] : null;
+            return ultimo && ultimo.asistente ? `Claro, te lo repito: ${ultimo.asistente}` : "Claro. Dime qué parte quieres que te explique de nuevo.";
+        }
+        if (/\b(qu[eé] recuerdas|qu[eé] hemos hablado|de qu[eé] habl[aá]bamos)\b/.test(t)) {
+            const ultimo = window.__nuraConversacion.length > 1 ? window.__nuraConversacion[window.__nuraConversacion.length - 2] : null;
+            return ultimo ? `Lo último que estábamos viendo era esto: tú me dijiste “${ultimo.usuario}” y yo te respondí “${ultimo.asistente}”.` : "Apenas estamos empezando esta conversación. Cuéntame qué necesitas y llevaré el hilo durante esta sesión.";
+        }
+        if (/\b(hola|buenas|buenos d[ií]as|buenas tardes|buenas noches)\b/.test(t)) {
+            return "¡Hola! Aquí estoy. Podemos platicar con naturalidad; si estamos resolviendo algo, intentaré mantener el contexto para no hacerte repetir todo.";
+        }
+        return null;
+    }
+
+    function responderVozNura(texto) {
+        const t = texto.toLowerCase();
+        let respuesta = "Puedo ayudarte con tu alimentación, tus entrenamientos y tu progreso. Si me cuentas qué necesitas, lo vemos paso a paso.";
+        let accion = null;
+        const conversacionPendiente = Boolean(window.__nuraPendienteBebida || window.__nuraPendienteAlimento);
+
+        // Las respuestas a una pregunta pendiente tienen prioridad sobre cualquier otro intent.
+        if (conversacionPendiente || t.includes("no tengo") || t.includes("no cuento con") || t.includes("no hay") || t.includes("se me acab") || t.includes("ya no tengo") || t.includes("desayuno") || t.includes("desayunar") || t.includes("comida") || t.includes("comer") || t.includes("almuerzo") || t.includes("cena") || t.includes("cenar") || t.includes("alimentación") || t.includes("alimentacion") || t.includes("menú") || t.includes("menu") || t.includes("qué como") || t.includes("que como") || t.includes("bebida") || t.includes("tomar") || /\btengo(n)?\s+(huevos?|jam[oó]n|salchicha|queso|tortillas?|pan)\b/i.test(t)) {
+            respuesta = obtenerResumenAlimentacionVoz(texto);
+        } else if (t.includes("progreso") || t.includes("historial")) {
+            respuesta = "Claro. Te voy a mostrar tu progreso. Después podemos seguir conversando.";
+            accion = () => mostrarProgresoNura();
+        } else if (t.includes("semana") || t.includes("plan")) {
+            respuesta = "Claro. Voy a mostrarte tu semana y después seguimos con lo que necesites.";
+            accion = () => generarPlan();
+        } else if (t.includes("entrenamiento") || t.includes("entrenar") || t.includes("gimnasio")) {
+            respuesta = "Perfecto. Puedes elegir una sesión desde tu semana y te acompaño durante el entrenamiento. ¿Quieres consultar la rutina o cambiar algo?";
+        } else {
+            respuesta = responderConversacionGeneralNura(t) || respuesta;
+        }
+
+        guardarTurnoConversacionNura(texto, respuesta);
+        const estado = document.getElementById("estadoVozNura");
+        if (estado) estado.textContent = respuesta;
+
+        const terminar = () => {
+            if (accion) {
+                setTimeout(() => {
+                    if (!vozActivaNura) return;
+                    accion();
+                    actualizarEstadoVozNura("Listo. Te sigo escuchando…");
+                    programarEscuchaNura();
+                }, 450);
+                return;
+            }
+            if (vozActivaNura) {
+                actualizarEstadoVozNura("Te escucho…");
+                programarEscuchaNura();
+            }
+        };
+
+        hablarTextoNaturalNura(respuesta, terminar);
+    }
+
+    function cerrarVozNura(event) {
+        if (event && event.target !== event.currentTarget) return;
+        vozActivaNura = false;
+        vozHablandoNura = false;
+        clearTimeout(reinicioVozNura);
+        if (reconocimientoNura && escuchandoNura) {
+            try { reconocimientoNura.stop(); } catch (e) {}
+        }
+        if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+        const panel = document.getElementById("panelVozNura");
+        if (panel) panel.remove();
+        reconocimientoNura = null;
+        escuchandoNura = false;
     }
 
 
