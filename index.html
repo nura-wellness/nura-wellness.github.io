@@ -2,7 +2,14 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#1b8f72">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="NURA">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
     <title>NURA - Tu bienestar comienza aquí</title>
 
     <style>
@@ -954,32 +961,74 @@
 
     const rutinasPorSesion = {
 
+        /*
+           Cada sesión contiene 8 ejercicios.
+           El motor conserva las series según el nivel de experiencia,
+           pero evita añadir volumen extra solo por tener más ejercicios.
+        */
+
         principiante: {
             A: {
                 nombre: "Tren superior",
                 calentamiento: [["Marcha suave en el sitio", "5 minutos"], ["Movilidad de hombros y brazos", "5 minutos"], ["Movilidad suave de cuello y espalda", "5 minutos"]],
-                ejercicios: [["Flexiones apoyadas", "2 series × 8-12"], ["Remo con banda o mochila", "2 series × 8-12"], ["Press de hombros con botellas", "2 series × 8-12"], ["Curl de bíceps con botellas", "2 series × 10-12"]],
+                ejercicios: [
+                    ["Flexiones apoyadas", "2 series × 8-12"],
+                    ["Remo con banda o mochila", "2 series × 8-12"],
+                    ["Press de hombros con botellas", "2 series × 8-12"],
+                    ["Jalón con banda", "2 series × 8-12"],
+                    ["Curl de bíceps con botellas", "2 series × 10-12"],
+                    ["Extensión de tríceps con banda", "2 series × 10-12"],
+                    ["Elevaciones laterales con poco peso", "2 series × 10-12"],
+                    ["Aperturas con banda", "2 series × 10-12"]
+                ],
                 cardio: ["Caminata a ritmo cómodo", "10 minutos"],
                 calma: ["Respiración tranquila y movilidad suave", "3-5 minutos"]
             },
             B: {
                 nombre: "Pierna + glúteo",
                 calentamiento: [["Marcha suave en el sitio", "5 minutos"], ["Movilidad de cadera y tobillos", "5 minutos"], ["Sentadillas muy suaves", "5 minutos"]],
-                ejercicios: [["Sentadilla a peso corporal", "2 series × 8-12"], ["Puente de glúteos", "2 series × 10-15"], ["Desplante asistido", "2 series × 8-10 por lado"], ["Elevación de talones", "2 series × 10-15"]],
+                ejercicios: [
+                    ["Sentadilla a peso corporal", "2 series × 8-12"],
+                    ["Puente de glúteos", "2 series × 10-15"],
+                    ["Desplante asistido", "2 series × 8-10 por lado"],
+                    ["Elevación de talones", "2 series × 10-15"],
+                    ["Paso al frente en plataforma baja", "2 series × 8-10 por lado"],
+                    ["Extensión de pierna con poco peso", "2 series × 10-12"],
+                    ["Curl de pierna con poco peso", "2 series × 10-12"],
+                    ["Abducción de cadera con banda", "2 series × 10-15"]
+                ],
                 cardio: ["Caminata a ritmo cómodo", "10 minutos"],
                 calma: ["Respiración tranquila y movilidad suave", "3-5 minutos"]
             },
             C: {
                 nombre: "Tren superior + core",
                 calentamiento: [["Marcha suave en el sitio", "5 minutos"], ["Movilidad de hombros y brazos", "5 minutos"], ["Movilidad suave de columna", "5 minutos"]],
-                ejercicios: [["Flexiones apoyadas", "2 series × 8-12"], ["Remo con banda o mochila", "2 series × 8-12"], ["Press de hombros con botellas", "2 series × 8-12"], ["Plancha apoyada", "2 series × 15-25 segundos"]],
+                ejercicios: [
+                    ["Press inclinado con poco peso", "2 series × 8-12"],
+                    ["Remo sentado con banda", "2 series × 8-12"],
+                    ["Jalón con banda", "2 series × 8-12"],
+                    ["Press de hombros con botellas", "2 series × 8-12"],
+                    ["Elevaciones laterales con poco peso", "2 series × 10-12"],
+                    ["Curl martillo con botellas", "2 series × 10-12"],
+                    ["Extensión de tríceps con banda", "2 series × 10-12"],
+                    ["Dead bug", "2 series × 8-10 por lado"]
+                ],
                 cardio: ["Caminata a ritmo cómodo", "10 minutos"],
                 calma: ["Respiración tranquila y movilidad suave", "3-5 minutos"]
             },
             D: {
                 nombre: "Pierna + glúteo",
                 calentamiento: [["Marcha suave en el sitio", "5 minutos"], ["Movilidad de cadera y tobillos", "5 minutos"], ["Sentadillas muy suaves", "5 minutos"]],
-                ejercicios: [["Sentadilla a peso corporal", "2 series × 8-12"], ["Puente de glúteos", "2 series × 10-15"], ["Paso atrás asistido", "2 series × 8-10 por lado"], ["Elevación de talones", "2 series × 10-15"]],
+                ejercicios: [
+                    ["Sentarse y levantarse de un banco", "2 series × 8-12"],
+                    ["Puente de glúteos", "2 series × 10-15"],
+                    ["Paso lateral con banda", "2 series × 10-12 por lado"],
+                    ["Elevación de talones", "2 series × 10-15"],
+                    ["Paso al frente en plataforma baja", "2 series × 8-10 por lado"],
+                    ["Extensión de pierna con poco peso", "2 series × 10-12"],
+                    ["Curl de pierna con poco peso", "2 series × 10-12"],
+                    ["Abducción de cadera con banda", "2 series × 10-15"]
+                ],
                 cardio: ["Caminata a ritmo cómodo", "10 minutos"],
                 calma: ["Respiración tranquila y movilidad suave", "3-5 minutos"]
             }
@@ -989,28 +1038,64 @@
             A: {
                 nombre: "Tren superior",
                 calentamiento: [["Marcha activa en el sitio", "5 minutos"], ["Movilidad de hombros y brazos", "5 minutos"], ["Activación suave de espalda", "5 minutos"]],
-                ejercicios: [["Flexiones", "3 series × 8-12"], ["Remo con banda o mochila", "3 series × 8-12"], ["Press de hombros", "3 series × 8-12"], ["Curl de bíceps", "3 series × 10-12"]],
+                ejercicios: [
+                    ["Press de pecho", "3 series × 8-12"],
+                    ["Remo", "3 series × 8-12"],
+                    ["Press de hombros", "3 series × 8-12"],
+                    ["Jalón al pecho", "3 series × 8-12"],
+                    ["Curl de bíceps", "3 series × 10-12"],
+                    ["Extensión de tríceps", "3 series × 10-12"],
+                    ["Elevaciones laterales", "3 series × 10-12"],
+                    ["Face pull", "3 series × 10-12"]
+                ],
                 cardio: ["Caminata rápida o bicicleta suave", "12-15 minutos"],
                 calma: ["Respiración y movilidad suave", "5 minutos"]
             },
             B: {
                 nombre: "Pierna + glúteo",
                 calentamiento: [["Marcha activa", "5 minutos"], ["Movilidad de cadera y tobillos", "5 minutos"], ["Sentadillas suaves", "5 minutos"]],
-                ejercicios: [["Sentadilla", "3 series × 8-12"], ["Puente de glúteos", "3 series × 12-15"], ["Desplante", "3 series × 8-10 por lado"], ["Elevación de talones", "3 series × 12-15"]],
+                ejercicios: [
+                    ["Sentadilla", "3 series × 8-12"],
+                    ["Hip thrust", "3 series × 10-12"],
+                    ["Desplante", "3 series × 8-10 por lado"],
+                    ["Elevación de talones", "3 series × 12-15"],
+                    ["Prensa de piernas", "3 series × 10-12"],
+                    ["Extensión de pierna", "3 series × 10-12"],
+                    ["Curl de pierna", "3 series × 10-12"],
+                    ["Abducción de cadera", "3 series × 12-15"]
+                ],
                 cardio: ["Caminata rápida o bicicleta suave", "12-15 minutos"],
                 calma: ["Respiración y movilidad suave", "5 minutos"]
             },
             C: {
                 nombre: "Tren superior + core",
                 calentamiento: [["Marcha activa", "5 minutos"], ["Movilidad de hombros y brazos", "5 minutos"], ["Activación de core suave", "5 minutos"]],
-                ejercicios: [["Flexiones", "3 series × 8-12"], ["Remo", "3 series × 8-12"], ["Press de hombros", "3 series × 8-12"], ["Plancha", "3 series × 20-30 segundos"]],
+                ejercicios: [
+                    ["Press inclinado", "3 series × 8-12"],
+                    ["Remo sentado", "3 series × 8-12"],
+                    ["Jalón con agarre neutro", "3 series × 8-12"],
+                    ["Press de hombros en máquina", "3 series × 8-12"],
+                    ["Pájaros para hombro posterior", "3 series × 10-12"],
+                    ["Curl martillo", "3 series × 10-12"],
+                    ["Extensión de tríceps en polea", "3 series × 10-12"],
+                    ["Plancha", "3 series × 20-30 segundos"]
+                ],
                 cardio: ["Caminata rápida o bicicleta suave", "12-15 minutos"],
                 calma: ["Respiración y movilidad suave", "5 minutos"]
             },
             D: {
                 nombre: "Pierna + glúteo",
                 calentamiento: [["Marcha activa", "5 minutos"], ["Movilidad de cadera y tobillos", "5 minutos"], ["Sentadillas suaves", "5 minutos"]],
-                ejercicios: [["Sentadilla", "3 series × 8-12"], ["Puente de glúteos", "3 series × 12-15"], ["Desplante", "3 series × 8-10 por lado"], ["Elevación de talones", "3 series × 12-15"]],
+                ejercicios: [
+                    ["Prensa de piernas", "3 series × 10-12"],
+                    ["Step-up a plataforma baja", "3 series × 8-10 por lado"],
+                    ["Sentadilla goblet", "3 series × 8-12"],
+                    ["Curl de pierna", "3 series × 10-12"],
+                    ["Extensión de pierna", "3 series × 10-12"],
+                    ["Elevación de talones", "3 series × 12-15"],
+                    ["Abducción de cadera", "3 series × 12-15"],
+                    ["Puente de glúteos", "3 series × 10-15"]
+                ],
                 cardio: ["Caminata rápida o bicicleta suave", "12-15 minutos"],
                 calma: ["Respiración y movilidad suave", "5 minutos"]
             }
@@ -1020,40 +1105,102 @@
             A: {
                 nombre: "Tren superior",
                 calentamiento: [["Marcha activa", "5 minutos"], ["Movilidad dinámica de hombros", "5 minutos"], ["Activación de espalda y brazos", "5 minutos"]],
-                ejercicios: [["Flexiones o press", "3 series × 8-12"], ["Remo", "3 series × 8-12"], ["Press de hombros", "3 series × 8-12"], ["Trabajo de brazos", "3 series × 10-12"]],
+                ejercicios: [
+                    ["Press de pecho", "3 series × 8-12"],
+                    ["Remo", "3 series × 8-12"],
+                    ["Press de hombros", "3 series × 8-12"],
+                    ["Jalón al pecho", "3 series × 8-12"],
+                    ["Curl de bíceps", "3 series × 10-12"],
+                    ["Extensión de tríceps", "3 series × 10-12"],
+                    ["Elevaciones laterales", "3 series × 10-12"],
+                    ["Face pull", "3 series × 10-12"]
+                ],
                 cardio: ["Caminata rápida, bicicleta o elíptica", "15-20 minutos"],
                 calma: ["Respiración y movilidad suave", "5 minutos"]
             },
             B: {
                 nombre: "Pierna + glúteo",
                 calentamiento: [["Marcha activa", "5 minutos"], ["Movilidad dinámica de cadera y tobillos", "5 minutos"], ["Sentadillas progresivas", "5 minutos"]],
-                ejercicios: [["Sentadilla", "3 series × 8-12"], ["Puente de glúteos", "3 series × 12-15"], ["Desplante", "3 series × 8-10 por lado"], ["Trabajo de pierna", "3 series"]],
+                ejercicios: [
+                    ["Sentadilla", "3 series × 8-12"],
+                    ["Hip thrust", "3 series × 8-12"],
+                    ["Desplante", "3 series × 8-10 por lado"],
+                    ["Elevación de talones", "3 series × 12-15"],
+                    ["Prensa de piernas", "3 series × 8-12"],
+                    ["Extensión de pierna", "3 series × 10-12"],
+                    ["Curl de pierna", "3 series × 10-12"],
+                    ["Abducción de cadera", "3 series × 12-15"]
+                ],
                 cardio: ["Caminata rápida, bicicleta o elíptica", "15-20 minutos"],
                 calma: ["Respiración y movilidad suave", "5 minutos"]
             },
             C: {
                 nombre: "Tren superior + core",
                 calentamiento: [["Marcha activa", "5 minutos"], ["Movilidad dinámica de hombros", "5 minutos"], ["Activación de core", "5 minutos"]],
-                ejercicios: [["Flexiones o press", "3 series × 8-12"], ["Remo", "3 series × 8-12"], ["Press de hombros", "3 series × 8-12"], ["Trabajo de core", "3 series"]],
+                ejercicios: [
+                    ["Press inclinado", "3 series × 8-12"],
+                    ["Remo sentado", "3 series × 8-12"],
+                    ["Jalón con agarre neutro", "3 series × 8-12"],
+                    ["Press de hombros en máquina", "3 series × 8-12"],
+                    ["Pájaros para hombro posterior", "3 series × 10-12"],
+                    ["Curl martillo", "3 series × 10-12"],
+                    ["Extensión de tríceps en polea", "3 series × 10-12"],
+                    ["Plancha", "3 series × 20-40 segundos"]
+                ],
                 cardio: ["Caminata rápida, bicicleta o elíptica", "15-20 minutos"],
                 calma: ["Respiración y movilidad suave", "5 minutos"]
             },
             D: {
                 nombre: "Pierna + glúteo",
                 calentamiento: [["Marcha activa", "5 minutos"], ["Movilidad dinámica de cadera y tobillos", "5 minutos"], ["Sentadillas progresivas", "5 minutos"]],
-                ejercicios: [["Sentadilla", "3 series × 8-12"], ["Puente de glúteos", "3 series × 12-15"], ["Desplante", "3 series × 8-10 por lado"], ["Trabajo de pierna", "3 series"]],
+                ejercicios: [
+                    ["Prensa de piernas", "3 series × 8-12"],
+                    ["Step-up a plataforma baja", "3 series × 8-10 por lado"],
+                    ["Sentadilla goblet", "3 series × 8-12"],
+                    ["Curl de pierna", "3 series × 10-12"],
+                    ["Extensión de pierna", "3 series × 10-12"],
+                    ["Elevación de talones", "3 series × 12-15"],
+                    ["Abducción de cadera", "3 series × 12-15"],
+                    ["Puente de glúteos", "3 series × 10-15"]
+                ],
                 cardio: ["Caminata rápida, bicicleta o elíptica", "15-20 minutos"],
                 calma: ["Respiración y movilidad suave", "5 minutos"]
             }
         }
     };
 
-
     /* =====================================================
        PORTADA
     ===================================================== */
 
-    function mostrarPortada() {
+    let eventoInstalacionNura = null;
+
+    window.addEventListener("beforeinstallprompt", (evento) => {
+        evento.preventDefault();
+        eventoInstalacionNura = evento;
+        const boton = document.getElementById("btnInstalarNura");
+        if (boton) boton.style.display = "block";
+    });
+
+    window.addEventListener("appinstalled", () => {
+        eventoInstalacionNura = null;
+        const boton = document.getElementById("btnInstalarNura");
+        if (boton) boton.style.display = "none";
+    });
+
+    async function instalarNura() {
+        if (!eventoInstalacionNura) {
+            alert("Para instalar NURA, abre esta aplicación desde el navegador y usa la opción 'Agregar a pantalla de inicio'.");
+            return;
+        }
+        eventoInstalacionNura.prompt();
+        await eventoInstalacionNura.userChoice;
+        eventoInstalacionNura = null;
+        const boton = document.getElementById("btnInstalarNura");
+        if (boton) boton.style.display = "none";
+    }
+
+function mostrarPortada() {
 
         document.getElementById("app").innerHTML = `
 
@@ -1073,6 +1220,8 @@
                     <button class="btn-principal" onclick="iniciarCuestionario()">
                         Comenzar →
                     </button>
+
+                    <button id="btnInstalarNura" class="btn-secundario" style="width:100%;margin-top:10px;display:none;" onclick="instalarNura()">📲 Instalar NURA</button>
 
                     <div class="mini-text">
                         Alimentación · Movimiento · Bienestar
@@ -2053,11 +2202,8 @@
 
     function obtenerSeriesParaNivel() {
 
+        // Con 8 ejercicios por sesión, NURA mantiene un volumen moderado.
         if (datosNura.experiencia === "avanzado") {
-            return 4;
-        }
-
-        if (datosNura.experiencia === "intermedio") {
             return 3;
         }
 
@@ -3194,6 +3340,12 @@
     mostrarPortada();
 
 </script>
+
+<script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+        }
+    </script>
 
 </body>
 </html>
