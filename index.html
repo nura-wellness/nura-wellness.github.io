@@ -1175,11 +1175,25 @@
 
     let eventoInstalacionNura = null;
 
+    function nuraYaEstaInstalada() {
+        return window.matchMedia("(display-mode: standalone)").matches ||
+               window.navigator.standalone === true;
+    }
+
+    function esIOS() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+               (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    }
+
+    function esAndroid() {
+        return /Android/i.test(navigator.userAgent);
+    }
+
     window.addEventListener("beforeinstallprompt", (evento) => {
         evento.preventDefault();
         eventoInstalacionNura = evento;
         const boton = document.getElementById("btnInstalarNura");
-        if (boton) boton.style.display = "block";
+        if (boton && !nuraYaEstaInstalada()) boton.style.display = "block";
     });
 
     window.addEventListener("appinstalled", () => {
@@ -1188,16 +1202,34 @@
         if (boton) boton.style.display = "none";
     });
 
-    async function instalarNura() {
-        if (!eventoInstalacionNura) {
-            alert("Para instalar NURA, abre esta aplicación desde el navegador y usa la opción 'Agregar a pantalla de inicio'.");
+    function mostrarAyudaInstalacionNura() {
+        if (esIOS()) {
+            alert("Para instalar NURA en tu iPhone o iPad:\n\n1. Pulsa el botón Compartir ↗️ de Safari.\n2. Selecciona 'Añadir a pantalla de inicio'.\n3. Pulsa 'Añadir'.\n\nAsí tendrás NURA como una aplicación en tu pantalla de inicio.");
             return;
         }
+
+        if (esAndroid()) {
+            alert("Para instalar NURA en Android:\n\n1. Abre el menú ⋮ de tu navegador.\n2. Busca 'Instalar aplicación', 'Instalar NURA' o 'Añadir a pantalla de inicio'.\n3. Confirma la instalación.\n\nSi tu navegador muestra directamente la ventana de instalación, solo confirma.");
+            return;
+        }
+
+        alert("Para instalar NURA, usa el menú de tu navegador y selecciona la opción para instalar la aplicación o crear un acceso directo.");
+    }
+
+    async function instalarNura() {
+        if (nuraYaEstaInstalada()) return;
+
+        if (!eventoInstalacionNura) {
+            mostrarAyudaInstalacionNura();
+            return;
+        }
+
         eventoInstalacionNura.prompt();
         await eventoInstalacionNura.userChoice;
         eventoInstalacionNura = null;
+
         const boton = document.getElementById("btnInstalarNura");
-        if (boton) boton.style.display = "none";
+        if (boton && nuraYaEstaInstalada()) boton.style.display = "none";
     }
 
 function mostrarPortada() {
@@ -1221,7 +1253,7 @@ function mostrarPortada() {
                         Comenzar →
                     </button>
 
-                    <button id="btnInstalarNura" class="btn-secundario" style="width:100%;margin-top:10px;display:none;" onclick="instalarNura()">📲 Instalar NURA</button>
+                    <button id="btnInstalarNura" class="btn-secundario" style="width:100%;margin-top:10px;display:${nuraYaEstaInstalada() ? "none" : "block"};" onclick="instalarNura()">📲 Instalar NURA</button>
 
                     <div class="mini-text">
                         Alimentación · Movimiento · Bienestar
