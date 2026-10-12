@@ -931,6 +931,45 @@
             margin-left: 6px;
         }
 
+
+        /* =========================
+           ENTRENAMIENTO EN CASA O PARQUE
+        ========================= */
+        .btn-casa {
+            width: 100%; border: 2px solid #1b8f72; padding: 14px 16px;
+            border-radius: 16px; color: #176b58; font-size: 16px; font-weight: 700;
+            background: #effaf5; margin-top: 10px; transition: transform .15s ease;
+        }
+        .btn-casa:hover { transform: translateY(-1px); }
+        .privacidad-card { max-width:760px; margin:0 auto; background:#fff; border:1px solid #dcebe5; border-radius:24px; padding:clamp(20px,4vw,34px); box-shadow:0 12px 32px rgba(18,80,61,.08); }
+        .privacidad-lista { display:grid; gap:12px; margin:18px 0; }
+        .privacidad-item { display:flex; gap:12px; align-items:flex-start; padding:13px; background:#f2f8f5; border-radius:14px; line-height:1.45; }
+        .privacidad-item b { display:block; color:#176b58; margin-bottom:3px; }
+        .consent-check { display:flex; gap:10px; align-items:flex-start; margin:18px 0; line-height:1.5; }
+        .consent-check input, .alerta-check input { width:19px; height:19px; accent-color:#1b8f72; flex-shrink:0; }
+        .alertas-lista { display:grid; gap:10px; margin:14px 0 22px; }
+        .alerta-check { display:flex; gap:10px; align-items:center; padding:12px; border:1px solid #dcebe5; border-radius:13px; }
+        .privacidad-nota { font-size:13px; color:#607d7a; line-height:1.5; margin-top:14px; }
+        .casa-hero {
+            background: linear-gradient(135deg,#e8f8f0,#f5fbff); border-radius: 22px;
+            padding: 24px; margin-bottom: 20px; text-align: center;
+        }
+        .casa-hero .emoji { font-size: 42px; margin-bottom: 8px; }
+        .casa-hero h2 { color: #176b58; margin-bottom: 8px; }
+        .casa-hero p { color: #607d7a; line-height: 1.5; }
+        .casa-form { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+        .casa-field label { display:block; font-weight:700; font-size:14px; margin-bottom:8px; }
+        .casa-field select { width:100%; padding:13px; border:2px solid #e0e7e5; border-radius:12px; background:#fff; font:inherit; color:#263238; }
+        .casa-result { display:none; }
+        .casa-result.visible { display:block; }
+        .casa-exercise { padding:15px 0; border-bottom:1px solid #e6eeeb; }
+        .casa-exercise:last-child { border-bottom:none; }
+        .casa-exercise h4 { margin-bottom:5px; color:#176b58; }
+        .casa-exercise p { color:#607d7a; line-height:1.45; font-size:14px; }
+        .casa-note { background:#fff8e7; padding:14px; border-radius:14px; color:#735b20; line-height:1.45; font-size:14px; margin-top:14px; }
+        .btn-volver { width:100%; padding:13px; border:1px solid #d4e4df; background:#fff; border-radius:14px; color:#176b58; font-weight:700; margin-top:10px; }
+        @media(max-width:560px) { .casa-form { grid-template-columns:1fr; } .casa-hero { padding:20px 16px; } }
+
     </style>
 </head>
 
@@ -960,8 +999,53 @@
         alimentosEvitar: [],
         bebidasPreferidas: [],
         dias: [],
-        preparacionMaquina: {}
+        preparacionMaquina: {},
+        consentimientoPrivacidad: false,
+        alertas: { hidratacion: true, actividad: true, comidas: false, motivacion: true },
+        pesoCompartido: false
     };
+
+    const CLAVE_PERFIL_NURA = "nuraPerfilCompartidoV1";
+
+    function guardarPerfilNura() {
+        try {
+            // Solo persistimos después de que el usuario haya aceptado el consentimiento.
+            if (!datosNura.consentimientoPrivacidad) return;
+            localStorage.setItem(CLAVE_PERFIL_NURA, JSON.stringify(datosNura));
+        } catch (e) {
+            console.warn("NURA: no fue posible guardar el perfil en este navegador.", e);
+        }
+    }
+
+    function cargarPerfilNura() {
+        try {
+            const guardado = localStorage.getItem(CLAVE_PERFIL_NURA);
+            if (!guardado) return false;
+            const perfil = JSON.parse(guardado);
+            if (!perfil || typeof perfil !== "object" || perfil.consentimientoPrivacidad !== true) return false;
+            datosNura = { ...datosNura, ...perfil };
+            if (!Array.isArray(datosNura.alimentosIncluidos)) datosNura.alimentosIncluidos = [];
+            if (!Array.isArray(datosNura.alimentosEvitar)) datosNura.alimentosEvitar = [];
+            if (!Array.isArray(datosNura.bebidasPreferidas)) datosNura.bebidasPreferidas = [];
+            if (!Array.isArray(datosNura.dias)) datosNura.dias = [];
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function borrarPerfilNura() {
+        try { localStorage.removeItem(CLAVE_PERFIL_NURA); } catch (e) {}
+        datosNura = {
+            nombre:"", planTipo:"", voz:"", sexo:"", edad:"", peso:"", altura:"",
+            actividad:"", experiencia:"", objetivo:"", alimentacion:"", alimentosIncluidos:[],
+            alimentosEvitar:[], bebidasPreferidas:[], dias:[], preparacionMaquina:{},
+            consentimientoPrivacidad:false,
+            alertas:{hidratacion:true, actividad:true, comidas:false, motivacion:true},
+            pesoCompartido:false
+        };
+        mostrarPortada();
+    }
 
     let pasoActual = 1;
 
@@ -1508,9 +1592,11 @@ function mostrarPortada() {
                         y una rutina de ejercicio adaptada a ti.
                     </p>
 
-                    <button class="btn-principal" onclick="iniciarCuestionario()">
+                    <button class="btn-principal" onclick="mostrarConsentimiento()">
                         Comenzar →
                     </button>
+
+                    ${datosNura.consentimientoPrivacidad ? `<button class="btn-secundario" style="width:100%;margin-top:10px" onclick="iniciarCuestionario()">Continuar / editar mi perfil</button><button class="btn-secundario" style="width:100%;margin-top:8px" onclick="borrarPerfilNura()">Borrar mi perfil guardado</button>` : ""}
 
                     <button id="btnInstalarNura" class="btn-secundario" style="width:100%;margin-top:10px;display:${nuraYaEstaInstalada() ? "none" : "block"};" onclick="instalarNura()">📲 Instalar NURA</button>
 
@@ -1525,6 +1611,216 @@ function mostrarPortada() {
         `;
     }
 
+
+    /* =====================================================
+       ENTRENAMIENTO EN CASA O PARQUE
+    ===================================================== */
+    function mostrarEntrenamientoCasa() {
+        document.getElementById("app").innerHTML = `
+            <div class="pantalla">
+              <div class="contenedor">
+                <div class="casa-hero">
+                  <div class="emoji">🏡🌳</div>
+                  <h2>Entrena donde quieras</h2>
+                  <p>Rutinas de fuerza y movimiento para casa o parque, con el equipo que tengas disponible.</p>
+                  <p class="privacidad-nota">Adapta los ejercicios a tu capacidad y detente si sientes dolor o malestar. NURA no sustituye orientación médica.</p>
+                </div>
+                <div class="card">
+                  <h3 style="margin-bottom:8px;">Personaliza tu sesión</h3>
+                  <p style="color:#78909c;line-height:1.5;margin-bottom:20px;">Elige tus opciones y NURA preparará una rutina inicial para ti.</p>
+                  <div class="casa-form">
+                    <div class="casa-field"><label for="casaLugar">¿Dónde entrenas?</label><select id="casaLugar"><option value="casa">En casa</option><option value="parque">En el parque</option></select></div>
+                    <div class="casa-field"><label for="casaNivel">Experiencia</label><select id="casaNivel"><option value="principiante">Comenzando</option><option value="intermedio">Medio</option><option value="avanzado">Experto</option></select></div>
+                    <div class="casa-field"><label for="casaEquipo">¿Qué tienes disponible?</label><select id="casaEquipo"><option value="ninguno">Sin equipo (peso corporal: sentadillas, lagartijas adaptadas, abdominales, etc.)</option><option value="silla">Silla estable y pared</option><option value="bandas">Bandas elásticas</option><option value="mancuernas">Mancuernas</option></select></div>
+                    <div class="casa-field"><label for="casaObjetivo">¿Qué quieres trabajar?</label><select id="casaObjetivo"><option value="cuerpo">Cuerpo completo</option><option value="brazos">Brazos y hombros</option><option value="piernas">Piernas y glúteos</option><option value="movilidad">Movilidad y equilibrio</option></select></div>
+                    <div class="casa-field"><label for="casaTiempo">¿Cuánto tiempo tienes?</label><select id="casaTiempo"><option value="15">15 minutos</option><option value="30" selected>30 minutos</option><option value="45">45 minutos</option><option value="60">60 minutos (1 hora)</option><option value="90">90 minutos (1 h 30 min)</option><option value="120">120 minutos (2 horas)</option></select></div>
+                  </div>
+                  <button class="btn-principal" style="margin-top:20px;" onclick="generarRutinaCasa()">Crear mi rutina →</button>
+                  <button class="btn-volver" style="margin-top:10px;" onclick="generarPlanSemanalCasa()">📅 Crear mi plan semanal (lunes a domingo)</button>
+                  <button class="btn-volver" onclick="mostrarPortada()">← Volver al inicio</button>
+                </div>
+                <div id="resultadoCasa" class="card casa-result" aria-live="polite"></div>
+                <div id="planSemanalCasa" class="card casa-result" aria-live="polite"></div>
+              </div>
+            </div>`;
+    }
+
+    function generarRutinaCasa() {
+        const lugar = document.getElementById('casaLugar').value;
+        const nivel = document.getElementById('casaNivel').value;
+        const equipo = document.getElementById('casaEquipo').value;
+        const objetivo = document.getElementById('casaObjetivo').value;
+        const tiempo = Number(document.getElementById('casaTiempo').value);
+        const ejercicios = {
+          cuerpo: [
+            ['Sentarse y levantarse de una silla','8–10 repeticiones','Mantén los pies apoyados y levántate con control.'],
+            ['Flexiones en pared','8–10 repeticiones','Coloca las manos en la pared y mantén el cuerpo alineado.'],
+            ['Elevaciones de talones','10–12 repeticiones','Sujétate de una superficie estable si necesitas equilibrio.'],
+            ['Marcha suave en el sitio','45 segundos','Levanta los pies a un ritmo cómodo.'],
+            ['Bird-dog (brazo y pierna contrarios)','6 por lado','Hazlo despacio, sin arquear la espalda.'],
+            ['Remo con banda o sin equipo','8–10 repeticiones','Con banda, usa un anclaje diseñado para ello; sin banda, practica el gesto sin resistencia.'],
+            ['Paso atrás corto con apoyo','6 por lado','Sujétate de una pared o silla estable y usa un recorrido cómodo.'],
+            ['Empujes de manos contra la pared','8–10 repeticiones','Mantén el cuerpo alineado y evita forzar las muñecas.'],
+            ['Marcha con rodillas bajas','30–45 segundos','Mantén un ritmo en el que puedas respirar con normalidad.']
+          ],
+          brazos: [
+            ['Flexiones en pared','8–10 repeticiones','Mantén muñecas cómodas y cuerpo alineado.'],
+            ['Círculos de hombros','8 hacia cada lado','Haz círculos pequeños y controlados.'],
+            ['Curl de bíceps','8–10 repeticiones','Usa mancuernas ligeras o practica el movimiento sin peso.'],
+            ['Extensión de tríceps sin peso','8–10 repeticiones','Muévete sin forzar los codos.'],
+            ['Remo con banda o sin equipo','8–10 repeticiones','Usa solo una banda con anclaje seguro o realiza el gesto sin resistencia.'],
+            ['Empuje de hombros sin peso','8 repeticiones','Eleva los brazos solo hasta donde sea cómodo y baja despacio.'],
+            ['Apertura y cierre de brazos','10 repeticiones','Controla el movimiento sin subir los hombros hacia las orejas.']
+          ],
+          piernas: [
+            ['Sentarse y levantarse de una silla','8–10 repeticiones','Controla el movimiento y evita dejarte caer.'],
+            ['Elevaciones de talones','10–12 repeticiones','Sujétate si necesitas apoyo.'],
+            ['Paso lateral corto','8 por lado','Da pasos cortos en una superficie despejada.'],
+            ['Extensión de rodilla sentado','8 por pierna','Extiende una pierna sin bloquear la rodilla.'],
+            ['Puente de glúteos','8–10 repeticiones','Si te resulta cómodo, hazlo sobre una superficie firme.'],
+            ['Paso lateral corto','8 por lado','Mantén las rodillas cómodas y el espacio despejado.'],
+            ['Extensión de cadera de pie','8 por pierna','Sujétate de un apoyo estable y evita arquear la espalda.'],
+            ['Sentadilla parcial a silla','6–8 repeticiones','Baja solo hasta donde puedas mantener el control.']
+          ],
+          movilidad: [
+            ['Marcha suave en el sitio','1 minuto','Respira con normalidad y usa un ritmo cómodo.'],
+            ['Círculos de hombros','8 hacia cada lado','Haz movimientos suaves, sin dolor.'],
+            ['Movilidad de tobillos','8 por lado','Puedes hacerlo sentado o de pie con apoyo.'],
+            ['Sentarse y levantarse de una silla','6–8 repeticiones','Usa una silla estable y mueve el cuerpo con control.'],
+            ['Equilibrio con apoyo','15–20 segundos por lado','Mantén una mano cerca de una pared o soporte estable.']
+          ]
+        };
+        let lista = ejercicios[objetivo] || ejercicios.cuerpo;
+        if (equipo === 'bandas' && objetivo !== 'movilidad') {
+          lista = lista.map(e => e[0].startsWith('Remo') ? ['Remo con banda elástica','8–10 repeticiones','Usa únicamente una banda en buen estado y un anclaje seguro.'] : e);
+        }
+        if (equipo === 'mancuernas' && (objetivo === 'brazos' || objetivo === 'cuerpo')) {
+          lista = lista.map(e => e[0] === 'Curl de bíceps' ? ['Curl de bíceps con mancuernas ligeras','8–10 repeticiones','Elige un peso que puedas controlar sin balancear el cuerpo.'] : e);
+        }
+        if (nivel === 'principiante') lista = lista.slice(0, Math.min(4, lista.length));
+        // La duración elegida organiza la sesión, pero no convierte todo ese tiempo en esfuerzo intenso.
+        // Las sesiones largas incluyen pausas y recuperación; se evita multiplicar excesivamente las rondas.
+        const rondas = nivel === 'avanzado' && tiempo >= 45 ? 3 : (nivel === 'intermedio' && tiempo >= 45 ? 2 : (tiempo >= 30 ? 2 : 1));
+        const incluyePausaLarga = tiempo >= 60;
+        const incluyeRecuperacionExtendida = tiempo >= 90;
+        const resultado = document.getElementById('resultadoCasa');
+        resultado.innerHTML = `
+          <h2 style="color:#176b58;margin-bottom:8px;">Tu rutina está lista 💪</h2>
+          <p style="color:#607d7a;line-height:1.5;margin-bottom:12px;">${lugar === 'parque' ? 'Sesión para el parque' : 'Sesión para casa'} · ${tiempo} minutos · ${nivel === 'principiante' ? 'Comenzando' : (nivel === 'intermedio' ? 'Medio' : 'Experto')} · ${rondas} ${rondas === 1 ? 'ronda' : 'rondas'}</p>
+          <div style="background:#effaf5;border-radius:14px;padding:13px;margin-bottom:10px;"><strong>Antes de empezar:</strong> dedica 5–8 minutos a caminar suave y mover hombros, caderas y tobillos. La duración seleccionada incluye preparación, descansos y vuelta a la calma; no necesitas entrenar intensamente durante todo ese tiempo.</div>
+          ${lista.map((e,i)=>`<div class="casa-exercise"><h4>${i+1}. ${e[0]}</h4><p><strong>${e[1]}</strong></p><p>${e[2]}</p></div>`).join('')}
+          ${incluyePausaLarga ? '<div class="casa-exercise"><h4>Descanso y recuperación</h4><p><strong>5–10 minutos según lo necesites</strong></p><p>Alterna bloques de ejercicios con pausas. Bebe agua y recupera la respiración antes de continuar.</p></div>' : ''}
+          ${incluyeRecuperacionExtendida ? '<div class="casa-exercise"><h4>Bloque suave opcional</h4><p><strong>10–15 minutos</strong></p><p>Para completar una sesión larga, elige caminata cómoda y movilidad suave. No repitas muchas rondas ni trabajes el mismo grupo muscular intensamente solo para llenar el tiempo.</p></div>' : ''}
+          <div class="casa-exercise"><h4>Vuelta a la calma</h4><p><strong>3–5 minutos</strong></p><p>Camina despacio y haz movimientos suaves de brazos y piernas.</p></div>
+          <div class="casa-note"><strong>Seguridad:</strong> haz los movimientos a un ritmo cómodo, descansa cuando lo necesites y detente si sientes dolor, mareo o falta de aire inusual. Usa una silla firme y una zona despejada. La duración es orientativa; no hace falta completar todas las rondas si necesitas descansar.</div>
+          <button class="btn-volver" onclick="mostrarEntrenamientoCasa()">↻ Cambiar mis opciones</button>
+          <button class="btn-principal" style="margin-top:10px;" onclick="mostrarPortada()">Volver al inicio</button>`;
+        resultado.classList.add('visible');
+        resultado.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+
+    function generarPlanSemanalCasa() {
+        const lugar = document.getElementById('casaLugar').value;
+        const nivel = document.getElementById('casaNivel').value;
+        const equipo = document.getElementById('casaEquipo').value;
+        const objetivo = document.getElementById('casaObjetivo').value;
+        const tiempo = Number(document.getElementById('casaTiempo').value);
+        const dias = [
+          {dia:'Lunes', foco: objetivo === 'movilidad' ? 'Movilidad y equilibrio' : 'Cuerpo completo', tipo: objetivo === 'movilidad' ? 'movilidad' : 'cuerpo', estado:'Entrenamiento'},
+          {dia:'Martes', foco:'Caminata cómoda y movilidad', tipo:'movilidad', estado:'Actividad suave'},
+          {dia:'Miércoles', foco: objetivo === 'brazos' ? 'Brazos y hombros' : 'Piernas y glúteos', tipo: objetivo === 'brazos' ? 'brazos' : 'piernas', estado:'Entrenamiento'},
+          {dia:'Jueves', foco:'Descanso y recuperación', tipo:'descanso', estado:'Recuperación'},
+          {dia:'Viernes', foco: objetivo === 'piernas' ? 'Cuerpo completo suave' : 'Brazos y torso', tipo: objetivo === 'piernas' ? 'cuerpo' : 'brazos', estado:'Entrenamiento'},
+          {dia:'Sábado', foco:'Actividad opcional al aire libre', tipo:'movilidad', estado:'Opcional'},
+          {dia:'Domingo', foco:'Descanso', tipo:'descanso', estado:'Recuperación'}
+        ];
+        let completados = {};
+        try { completados = JSON.parse(localStorage.getItem('nuraCasaSemana') || '{}'); } catch(e) { completados = {}; }
+        const cont = document.getElementById('planSemanalCasa');
+        cont.innerHTML = `
+          <h2 style="color:#176b58;margin-bottom:8px;">Tu plan semanal está listo 📅</h2>
+          <p style="color:#607d7a;line-height:1.5;margin-bottom:14px;">${lugar === 'parque' ? 'Parque' : 'Casa'} · ${nivel === 'principiante' ? 'Comenzando' : nivel === 'intermedio' ? 'Medio' : 'Experto'} · ${tiempo} min disponibles · ${equipo === 'ninguno' ? 'Peso corporal' : equipo === 'silla' ? 'Silla y pared' : equipo === 'bandas' ? 'Bandas elásticas' : 'Mancuernas'}</p>
+          <div style="background:#effaf5;border-radius:14px;padding:13px;margin-bottom:14px;">El plan alterna días de fuerza, actividad suave y recuperación. La duración elegida es un máximo disponible, no una obligación de entrenar intensamente todo ese tiempo.</div>
+          <div style="display:grid;gap:10px;">
+          ${dias.map((d,i)=>`<div style="border:1px solid #dcebe5;border-radius:14px;padding:13px;background:${completados[i]?'#effaf5':'#fff'};">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;"><strong>${d.dia}</strong><span class="badge">${completados[i]?'Completado':d.estado}</span></div>
+            <p style="margin:8px 0;color:#176b58;font-weight:600;">${d.foco}</p>
+            ${d.tipo === 'descanso' ? '<p style="font-size:14px;color:#607d7a;">Tómate el día para recuperarte; si quieres, realiza movimientos suaves sin exigirte.</p>' : `<button class="btn-volver" style="margin-top:4px;" onclick="rutinaDiaCasa('${d.tipo}')">Ver rutina de ${d.dia.toLowerCase()} →</button>`}
+            <button class="btn-volver" style="margin-top:8px;" onclick="marcarDiaCasa(${i})">${completados[i]?'✓ Día registrado':'Marcar día como completado'}</button>
+          </div>`).join('')}
+          </div>
+          <p id="resumenSemanaCasa" style="margin-top:14px;color:#176b58;font-weight:700;">Progreso: ${Object.values(completados).filter(Boolean).length} de 7 días registrados.</p>
+          <button class="btn-volver" style="margin-top:8px;" onclick="reiniciarSemanaCasa()">Reiniciar seguimiento semanal</button>`;
+        cont.classList.add('visible');
+        cont.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+
+    function rutinaDiaCasa(tipo) {
+        const objetivo = document.getElementById('casaObjetivo');
+        if (objetivo) objetivo.value = ['cuerpo','brazos','piernas','movilidad'].includes(tipo) ? tipo : 'cuerpo';
+        const resultado = document.getElementById('resultadoCasa');
+        if (resultado) resultado.classList.remove('visible');
+        generarRutinaCasa();
+    }
+
+    function marcarDiaCasa(indice) {
+        let completados = {};
+        try { completados = JSON.parse(localStorage.getItem('nuraCasaSemana') || '{}'); } catch(e) { completados = {}; }
+        completados[indice] = !completados[indice];
+        try { localStorage.setItem('nuraCasaSemana', JSON.stringify(completados)); } catch(e) {}
+        generarPlanSemanalCasa();
+    }
+
+    function reiniciarSemanaCasa() {
+        try { localStorage.removeItem('nuraCasaSemana'); } catch(e) {}
+        generarPlanSemanalCasa();
+    }
+
+    /* =====================================================
+       CONSENTIMIENTO, PRIVACIDAD Y ALERTAS
+       El prototipo guarda estas opciones solo en memoria durante
+       la sesión; no envía datos a un servidor.
+    ===================================================== */
+    function mostrarConsentimiento() {
+        document.getElementById("app").innerHTML = `
+          <div class="pantalla"><div class="privacidad-card">
+            <div class="cabecera"><div class="logo">NURA</div><h1>Tu bienestar y tu privacidad importan</h1><p>Antes de personalizar tu experiencia, revisa cómo utilizaremos tus respuestas.</p></div>
+            <div class="privacidad-lista">
+              <div class="privacidad-item"><span>🔐</span><div><b>Uso limitado</b>Usaremos tus respuestas para configurar las recomendaciones de esta sesión.</div></div>
+              <div class="privacidad-item"><span>🧭</span><div><b>Tú decides</b>El peso es opcional. Puedes continuar sin registrarlo y cambiar tus preferencias cuando quieras.</div></div>
+              <div class="privacidad-item"><span>🩺</span><div><b>No sustituye atención profesional</b>NURA ofrece orientación general, no diagnósticos ni tratamientos médicos.</div></div>
+              <div class="privacidad-item"><span>🗑️</span><div><b>Control de tus datos</b>Si aceptas, tu perfil se guarda en este navegador para compartirlo entre los módulos. No se envía a un servidor. Puedes borrarlo desde la pantalla de perfil; si borras los datos del navegador, también se eliminará.</div></div>
+            </div>
+            <h3>¿Qué recordatorios te gustaría recibir?</h3>
+            <div class="alertas-lista">
+              <label class="alerta-check"><input type="checkbox" id="alertaHidratacion" checked> 💧 Recordatorios para hidratarme</label>
+              <label class="alerta-check"><input type="checkbox" id="alertaActividad" checked> 🚶 Recordatorios para moverme y hacer pausas</label>
+              <label class="alerta-check"><input type="checkbox" id="alertaComidas"> 🍽️ Recordatorios de comidas</label>
+              <label class="alerta-check"><input type="checkbox" id="alertaMotivacion" checked> 💚 Mensajes de motivación</label>
+            </div>
+            <label class="consent-check"><input type="checkbox" id="aceptoPrivacidad"><span>He leído esta explicación y acepto que NURA utilice mis respuestas para personalizar esta experiencia. Entiendo que puedo dejar el peso sin responder.</span></label>
+            <p class="privacidad-nota">Las alertas son preferencias: todavía no envían notificaciones reales en segundo plano. El perfil queda guardado localmente en este dispositivo. No introduzcas información médica sensible en esta versión de prueba.</p>
+            <button class="btn-principal" onclick="aceptarPrivacidadYContinuar()">Aceptar y continuar →</button>
+            <button class="btn-secundario" style="width:100%;margin-top:10px" onclick="mostrarPortada()">Volver</button>
+          </div></div>`;
+    }
+
+    function aceptarPrivacidadYContinuar() {
+        const acepta = document.getElementById("aceptoPrivacidad");
+        if (!acepta || !acepta.checked) {
+            alert("Para continuar, confirma que leíste la explicación de privacidad.");
+            return;
+        }
+        datosNura.consentimientoPrivacidad = true;
+        datosNura.alertas = {
+            hidratacion: document.getElementById("alertaHidratacion").checked,
+            actividad: document.getElementById("alertaActividad").checked,
+            comidas: document.getElementById("alertaComidas").checked,
+            motivacion: document.getElementById("alertaMotivacion").checked
+        };
+        guardarPerfilNura();
+        iniciarCuestionario();
+    }
 
     /* =====================================================
        CUESTIONARIO
@@ -1627,7 +1923,9 @@ function mostrarPortada() {
                         <p>Elige cómo quieres usar NURA. Puedes cambiar esta decisión más adelante.</p>
                         <div class="opciones">
                             ${crearOpcion("planTipo", "alimentacion", "🍽️ Solo alimentación", "Quiero únicamente mi plan de alimentación y bebidas.")}
-                            ${crearOpcion("planTipo", "gym", "🏋️ Solo entrenamiento", "Quiero únicamente mi plan de gimnasio.")}
+                            ${crearOpcion("planTipo", "gym", "🏋️ Entrenamiento en gimnasio", "Quiero un plan para entrenar en el gimnasio.")}
+                            ${crearOpcion("planTipo", "casa", "🏡 Entrenamiento en casa o parque", "Quiero una rutina de fuerza y movimiento sin necesidad de ir al gimnasio.")}
+                            ${crearOpcion("planTipo", "correr", "🏃 Solo correr", "Quiero prepararme para caminar/trotar o correr 5, 8 o 10 km.")}
                             ${crearOpcion("planTipo", "ambos", "✨ Alimentación + entrenamiento", "Quiero que NURA prepare ambos planes para mí.")}
                         </div>
                     </div>
@@ -1707,18 +2005,20 @@ function mostrarPortada() {
             return `
                 <div class="paso" id="paso5">
 
-                    <h3>¿Cuánto pesas?</h3>
+                    <h3>¿Quieres registrar tu peso? (opcional)</h3>
 
                     <p>
-                        Introduce tu peso aproximado en kilogramos.
+                        Puedes dejar este campo vacío. El peso por sí solo no determina tu salud y NURA no lo utilizará para diagnosticarte.
                     </p>
 
                     <input
                         id="peso"
                         type="number"
                         min="1"
-                        placeholder="Ej. 80"
+                        max="500"
+                        placeholder="Puedes dejarlo en blanco"
                         value="${datosNura.peso}">
+                    <p class="privacidad-nota">Tu plan de hábitos y movimiento puede configurarse sin registrar el peso.</p>
                 </div>
             `;
         }
@@ -2031,6 +2331,10 @@ function mostrarPortada() {
         });
 
         elemento.classList.add("seleccionada");
+
+        // Todos los módulos comparten este mismo perfil; Solo correr abre al terminar la configuración.
+        guardarPerfilNura();
+
     }
 
 
@@ -2054,6 +2358,7 @@ function mostrarPortada() {
             }
         }
 
+        guardarPerfilNura();
         const incluye = document.getElementById(`incluye-${valor}`);
         const evita = document.getElementById(`evita-${valor}`);
 
@@ -2119,6 +2424,7 @@ function mostrarPortada() {
             return;
         }
 
+        guardarPerfilNura();
         const cantidad = datosNura.dias.length;
 
         contador.textContent =
@@ -2131,7 +2437,8 @@ function mostrarPortada() {
     }
 
     function requiereGym() {
-        return datosNura.planTipo === "gym" || datosNura.planTipo === "ambos";
+        // Casa/parque comparte el flujo principal de configuración y seguimiento.
+        return datosNura.planTipo === "gym" || datosNura.planTipo === "casa" || datosNura.planTipo === "correr" || datosNura.planTipo === "ambos";
     }
 
     function pasoEsRelevante(numero) {
@@ -2191,7 +2498,8 @@ function mostrarPortada() {
             const campo = document.getElementById("peso");
 
             if (campo) {
-                datosNura.peso = campo.value;
+                datosNura.peso = campo.value.trim();
+                datosNura.pesoCompartido = datosNura.peso !== "";
             }
 
         }
@@ -2209,6 +2517,7 @@ function mostrarPortada() {
         if (pasoActual === 10) {
             // La preferencia alimentaria se guarda directamente al seleccionar la opción.
         }
+        guardarPerfilNura();
     }
 
 
@@ -2223,7 +2532,7 @@ function mostrarPortada() {
 
         if (pasoActual === 1 && !datosNura.planTipo) {
 
-            alert("Elige si quieres alimentación, entrenamiento o ambos.");
+            alert("Elige la opción de NURA que mejor se adapte a ti.");
 
             return false;
         }
@@ -2248,14 +2557,6 @@ function mostrarPortada() {
         if (pasoActual === 4 && !datosNura.edad) {
 
             alert("Indica tu edad.");
-
-            return false;
-        }
-
-
-        if (pasoActual === 5 && !datosNura.peso) {
-
-            alert("Indica tu peso.");
 
             return false;
         }
@@ -2436,6 +2737,18 @@ function mostrarPortada() {
 
 
     function generarPlan() {
+        guardarPerfilNura();
+
+        // La opción casa/parque recorre el mismo asistente principal que gimnasio.
+        // Al terminar la configuración, se abre el módulo especializado de casa/parque.
+        if (datosNura.planTipo === "casa") {
+            mostrarEntrenamientoCasa();
+            return;
+        }
+        if (datosNura.planTipo === "correr") {
+            mostrarModuloCorrer();
+            return;
+        }
 
         const letrasSesiones = ["A", "B", "C", "D"];
         let numeroSesion = 0;
@@ -2475,16 +2788,179 @@ function mostrarPortada() {
     }
 
 
+    function crearOrientacionPeso() {
+        const edad = Number(datosNura.edad);
+        const peso = Number(datosNura.peso);
+        const alturaCm = Number(datosNura.altura);
+        if (!datosNura.peso || !Number.isFinite(peso) || peso <= 0 || !Number.isFinite(alturaCm) || alturaCm <= 0) {
+            return `<div class="card" style="margin-bottom:16px;border-left:4px solid #77b99b"><b>💚 Tu bienestar no depende de una cifra</b><p style="margin-top:7px;line-height:1.5;color:#607d7a">Puedes usar NURA sin registrar tu peso. Si algún día quieres orientación sobre tu salud, un profesional puede valorar tu situación completa.</p></div>`;
+        }
+        if (!Number.isFinite(edad) || edad < 18) {
+            return `<div class="card" style="margin-bottom:16px;border-left:4px solid #e0b35b"><b>🩺 Orientación para tu edad</b><p style="margin-top:7px;line-height:1.5;color:#607d7a">NURA no interpreta automáticamente el peso de menores de 18 años ni genera planes para adelgazar a partir de una cifra. Para una valoración personalizada, consulta a un profesional de salud junto con un adulto de confianza.</p></div>`;
+        }
+        const imc = peso / Math.pow(alturaCm / 100, 2);
+        if (imc >= 25) {
+            return `<div class="card" style="margin-bottom:16px;border-left:4px solid #e0b35b"><b>🩺 ¿Te gustaría recibir orientación profesional?</b><p style="margin-top:7px;line-height:1.5;color:#607d7a">Con los datos registrados, el IMC orientativo es ${imc.toFixed(1)}. En adultos es solo una referencia general y no diagnostica ni describe por sí sola la salud. Si te preocupa tu peso, un profesional puede revisar otros factores y ayudarte a decidir si necesitas algún cambio. NURA no activará una dieta restrictiva automáticamente.</p><button class="btn-volver" onclick="alert('Te recomendamos agendar una valoración con un profesional de salud o nutrición para recibir orientación individual. NURA no realiza diagnósticos ni gestiona citas.')">Ver recomendación profesional</button></div>`;
+        }
+        return `<div class="card" style="margin-bottom:16px;border-left:4px solid #77b99b"><b>🌿 Recomendación de bienestar</b><p style="margin-top:7px;line-height:1.5;color:#607d7a">Tu IMC orientativo es ${imc.toFixed(1)}. Este dato aislado no confirma tu estado de salud ni determina si debes cambiar tu peso. NURA se enfocará en hábitos equilibrados, movimiento, descanso y cómo te sientes.</p></div>`;
+    }
+
+    function mostrarModuloCorrer() {
+        const objetivo = window.nuraRunObjetivo || '5';
+        const nivel = window.nuraRunNivel || datosNura.experiencia || 'principiante';
+        const dias = Number(window.nuraRunDias || 3);
+        let completados = {};
+        try { completados = JSON.parse(localStorage.getItem('nuraRunSemana') || '{}'); } catch(e) {}
+        const plan = [
+          {dia:'Lunes', tipo:'suave', texto:'Caminata activa y trote cómodo, alternados según tu nivel.'},
+          {dia:'Martes', tipo:'descanso', texto:'Descanso o movilidad suave.'},
+          {dia:'Miércoles', tipo:'suave', texto:'Sesión corta y cómoda; termina sintiéndote capaz de continuar.'},
+          {dia:'Jueves', tipo:'descanso', texto:'Recuperación.'},
+          {dia:'Viernes', tipo:'progresivo', texto:'Sesión fácil. Solo aumenta el tiempo si la sesión anterior se sintió bien.'},
+          {dia:'Sábado', tipo:'opcional', texto:'Paseo o caminata ligera opcional.'},
+          {dia:'Domingo', tipo:'descanso', texto:'Descanso y revisión de cómo te sentiste esta semana.'}
+        ];
+        document.getElementById('app').innerHTML = `
+          <div class="pantalla"><div class="contenedor">
+            <div class="casa-hero"><div class="emoji">🏃‍♀️🏃‍♂️</div><h2>Solo correr</h2><p>Un plan progresivo para caminar, trotar y correr a tu ritmo. La distancia es una meta, no una obligación.</p></div>
+            <div class="card">
+              <h3>Personaliza tu plan</h3><div class="casa-form" style="margin-top:14px">
+                <div class="casa-field"><label for="runObjetivo">Objetivo</label><select id="runObjetivo" onchange="window.nuraRunObjetivo=this.value"><option value="inicial" ${objetivo==='inicial'?'selected':''}>Comenzar caminando y trotando</option><option value="5" ${objetivo==='5'?'selected':''}>5 km</option><option value="8" ${objetivo==='8'?'selected':''}>8 km</option><option value="10" ${objetivo==='10'?'selected':''}>10 km</option></select></div>
+                <div class="casa-field"><label for="runNivel">Experiencia</label><select id="runNivel" onchange="window.nuraRunNivel=this.value"><option value="principiante" ${nivel==='principiante'?'selected':''}>Comenzando</option><option value="intermedio" ${nivel==='intermedio'?'selected':''}>Medio</option><option value="avanzado" ${nivel==='avanzado'?'selected':''}>Experto</option></select></div>
+                <div class="casa-field"><label for="runDias">Días por semana</label><select id="runDias" onchange="window.nuraRunDias=this.value"><option value="2" ${dias===2?'selected':''}>2 días</option><option value="3" ${dias===3?'selected':''}>3 días</option><option value="4" ${dias===4?'selected':''}>4 días</option><option value="5" ${dias===5?'selected':''}>5 días</option></select></div>
+              </div>
+              <button class="btn-principal" style="margin-top:16px" onclick="generarPlanCorrer()">Crear mi plan semanal →</button>
+              <p class="privacidad-nota" style="margin-top:12px">Si estás empezando, elige caminar/trotar y aumenta gradualmente. Detente si sientes dolor o malestar; ante síntomas preocupantes, busca atención médica. No hay una fecha límite para alcanzar la distancia.</p>
+            </div>
+            <div class="card" style="margin-top:16px" id="runTimerCard">
+              <h3>⏱️ Cronómetro de carrera</h3>
+              <p style="color:#607d7a;line-height:1.5;margin-top:6px">Inicia al comenzar. Si permites el GPS, NURA intentará medir la distancia; también puedes anotarla manualmente al terminar.</p>
+              <div style="background:#eff8f3;border-radius:16px;padding:18px;margin-top:12px;text-align:center">
+                <div id="runTimerDisplay" style="font-size:36px;font-weight:800;color:#176b58;font-variant-numeric:tabular-nums">00:00:00</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+                  <div><div style="font-size:13px;color:#607d7a">Distancia GPS</div><strong id="runGpsDistance" style="font-size:21px">0.00 km</strong></div>
+                  <div><div style="font-size:13px;color:#607d7a">Ritmo aproximado</div><strong id="runPace" style="font-size:21px">--:-- /km</strong></div>
+                </div>
+                <p id="runGpsStatus" style="font-size:12px;color:#607d7a;margin-top:10px">GPS apagado; puedes registrar la distancia manualmente.</p>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+                <button id="runStartBtn" class="btn-principal" style="flex:1;min-width:120px" onclick="iniciarCronometroCarrera()">▶ Iniciar</button>
+                <button id="runPauseBtn" class="btn-volver" style="flex:1;min-width:120px;margin-top:0" onclick="pausarCronometroCarrera()" disabled>Ⅱ Pausar</button>
+                <button class="btn-volver" style="flex:1;min-width:120px;margin-top:0" onclick="finalizarCarrera()">■ Finalizar y guardar</button>
+              </div>
+              <div class="casa-field" style="margin-top:14px"><label for="runManualDistance">Distancia manual (km), si no usas GPS</label><input id="runManualDistance" type="number" min="0" max="100" step="0.01" placeholder="Ej. 3.50" style="width:100%;padding:13px;border:2px solid #e0e7e5;border-radius:12px;font:inherit"></div>
+            </div>
+            <div class="card" id="runProgressCard" style="margin-top:16px"><h3>📈 Mi progreso semanal</h3><p style="color:#607d7a;margin-top:8px">Tus sesiones guardadas aparecerán aquí.</p></div>
+            <div class="card" id="runPlan" style="margin-top:16px"><h3>Tu semana de carrera</h3><p style="color:#607d7a;margin-top:8px">Pulsa “Crear mi plan semanal” para mostrar tus sesiones.</p></div>
+            <button class="btn-volver" onclick="mostrarPortada()">← Volver al inicio</button>
+          </div></div>`;
+        renderizarProgresoCarrera();
+        // Mostrar el plan semanal desde que se abre Solo correr; no dejar una tarjeta vacía.
+        generarPlanCorrer();
+    }
+
+    function generarPlanCorrer() {
+        const objetivo = document.getElementById('runObjetivo')?.value || window.nuraRunObjetivo || '5';
+        const nivel = document.getElementById('runNivel')?.value || window.nuraRunNivel || 'principiante';
+        const dias = Number(document.getElementById('runDias')?.value || window.nuraRunDias || 3);
+        window.nuraRunObjetivo = objetivo; window.nuraRunNivel = nivel; window.nuraRunDias = dias; window.nuraRunPlanCreado = true;
+        datosNura.experiencia = nivel;
+        guardarPerfilNura();
+        let completados = {};
+        try { completados = JSON.parse(localStorage.getItem('nuraRunSemana') || '{}'); } catch(e) {}
+        const sesiones = nivel === 'principiante'
+          ? ['Camina 5 minutos para empezar; alterna 1 minuto de trote suave y 2 minutos caminando durante 15–20 minutos.','Camina 5 minutos; alterna trote cómodo y caminata durante 15–25 minutos.','Sesión cómoda de caminar/trotar durante 20–30 minutos, sin perseguir velocidad.']
+          : nivel === 'intermedio'
+          ? ['Calentamiento caminando 5–10 minutos y trote fácil 20–30 minutos.','Trote suave 20–35 minutos; mantén un ritmo que te permita hablar.','Sesión fácil algo más larga, 25–40 minutos, solo si te sientes bien.']
+          : ['Calentamiento progresivo y carrera fácil 25–40 minutos.','Sesión cómoda con algunos tramos moderados, sin esfuerzo máximo.','Carrera fácil 30–50 minutos según tu experiencia habitual.'];
+        const diasRun = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+        let indiceSesion = 0;
+        const contenido = diasRun.map((dia,i)=>{
+          const esSesion = [0,2,4,5].includes(i) && indiceSesion < dias;
+          let texto = 'Recuperación: descanso o movilidad suave.';
+          if (esSesion) { texto = sesiones[Math.min(indiceSesion, sesiones.length-1)]; indiceSesion++; }
+          const hecho = !!completados[i];
+          return `<div style="border:1px solid #dcebe5;border-radius:14px;padding:13px;margin-top:10px;background:${hecho?'#effaf5':'#fff'}"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><strong>${dia}</strong><span class="badge">${hecho?'Registrado':esSesion?'Carrera / caminar-trotar':'Recuperación'}</span></div><p style="margin-top:8px;line-height:1.5;color:#607d7a">${texto}</p><label style="display:block;margin-top:10px"><input type="checkbox" ${hecho?'checked':''} onchange="marcarCarreraDia(${i},this.checked)"> Marcar como realizado</label></div>`;
+        }).join('');
+        const el = document.getElementById('runPlan');
+        if (el) el.innerHTML = `<h3>Plan semanal · Objetivo ${objetivo==='inicial'?'caminar y trotar':objetivo+' km'}</h3><p style="color:#607d7a;margin-top:8px">Nivel: ${nivel}. ${dias} días de actividad planificados. La distancia se aumenta gradualmente durante varias semanas según tu respuesta, no de golpe.</p>${contenido}<p style="margin-top:14px;color:#176b58;font-weight:700">Progreso: ${Object.values(completados).filter(Boolean).length} días registrados.</p><button class="btn-volver" onclick="reiniciarCarreraSemana()">Reiniciar seguimiento semanal</button>`;
+        el?.scrollIntoView({behavior:'smooth',block:'start'});
+        renderizarProgresoCarrera();
+        actualizarVistaCronometro();
+    }
+
+    let nuraRunTimer = { activo:false, inicio:0, acumulado:0, watchId:null, ultimoPunto:null, metros:0, intervalo:null };
+    function tiempoCarreraMs() { return nuraRunTimer.acumulado + (nuraRunTimer.activo ? Date.now()-nuraRunTimer.inicio : 0); }
+    function formatoTiempoCarrera(ms) { const t=Math.floor(Math.max(0,ms)/1000), h=Math.floor(t/3600), m=Math.floor((t%3600)/60), sec=t%60; return [h,m,sec].map(v=>String(v).padStart(2,'0')).join(':'); }
+    function actualizarVistaCronometro() {
+      const display=document.getElementById('runTimerDisplay'); if(!display) return;
+      display.textContent=formatoTiempoCarrera(tiempoCarreraMs());
+      const km=nuraRunTimer.metros/1000; const dist=document.getElementById('runGpsDistance'); if(dist) dist.textContent=km.toFixed(2)+' km';
+      const pace=document.getElementById('runPace'); if(pace) { const mins=tiempoCarreraMs()/60000; pace.textContent=km>0&&mins>0 ? (Math.floor(mins/km)+':'+String(Math.floor((mins/km%1)*60).toString()).padStart(2,'0')+' /km') : '--:-- /km'; }
+      const start=document.getElementById('runStartBtn'), pause=document.getElementById('runPauseBtn'); if(start) start.disabled=nuraRunTimer.activo; if(pause) pause.disabled=!nuraRunTimer.activo;
+    }
+    function iniciarCronometroCarrera() {
+      if(nuraRunTimer.activo) return;
+      nuraRunTimer.inicio=Date.now(); nuraRunTimer.activo=true;
+      if(!nuraRunTimer.intervalo) nuraRunTimer.intervalo=setInterval(actualizarVistaCronometro,500);
+      const status=document.getElementById('runGpsStatus');
+      if(nuraRunTimer.watchId===null && navigator.geolocation) {
+        nuraRunTimer.ultimoPunto=null;
+        nuraRunTimer.watchId=navigator.geolocation.watchPosition(pos=>{
+          const c=pos.coords; if(c.accuracy && c.accuracy>60) return;
+          const punto={lat:c.latitude,lon:c.longitude};
+          if(nuraRunTimer.ultimoPunto) { const a=nuraRunTimer.ultimoPunto; const rad=x=>x*Math.PI/180; const dLat=rad(punto.lat-a.lat), dLon=rad(punto.lon-a.lon); const q=Math.sin(dLat/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(punto.lat))*Math.sin(dLon/2)**2; const m=6371000*2*Math.atan2(Math.sqrt(q),Math.sqrt(1-q)); if(m<150) nuraRunTimer.metros+=m; }
+          nuraRunTimer.ultimoPunto=punto; actualizarVistaCronometro(); if(status) status.textContent='GPS activo. La distancia es aproximada y depende de la señal.';
+        },err=>{ if(status) status.textContent='No se pudo usar el GPS. Puedes introducir la distancia manualmente al finalizar.'; nuraRunTimer.watchId=-1; },{enableHighAccuracy:true,maximumAge:2000,timeout:10000});
+      } else if(status && !navigator.geolocation) status.textContent='Este navegador no ofrece GPS. Puedes introducir la distancia manualmente.';
+      actualizarVistaCronometro();
+    }
+    function pausarCronometroCarrera() {
+      if(!nuraRunTimer.activo) return; nuraRunTimer.acumulado+=Date.now()-nuraRunTimer.inicio; nuraRunTimer.activo=false; actualizarVistaCronometro();
+      const status=document.getElementById('runGpsStatus'); if(status) status.textContent='Cronómetro pausado.';
+    }
+    function finalizarCarrera() {
+      if(nuraRunTimer.activo) pausarCronometroCarrera();
+      const input=document.getElementById('runManualDistance'); const manual=Number(input?.value||0); const km=nuraRunTimer.metros/1000; const distancia=km>0?km:manual; const ms=nuraRunTimer.acumulado;
+      if(ms<=0) { alert('Primero inicia el cronómetro para registrar una sesión.'); return; }
+      if(distancia<=0) { alert('No se detectó distancia por GPS. Introduce los kilómetros recorridos para guardar el registro.'); return; }
+      let logs=[]; try { logs=JSON.parse(localStorage.getItem('nuraRunRegistros')||'[]'); } catch(e){}
+      logs.push({fecha:new Date().toISOString(),ms,km:Number(distancia.toFixed(2)),objetivo:window.nuraRunObjetivo||'5',nivel:window.nuraRunNivel||datosNura.experiencia||'principiante'});
+      try { localStorage.setItem('nuraRunRegistros',JSON.stringify(logs)); } catch(e) { alert('No se pudo guardar el registro en este navegador.'); return; }
+      if(nuraRunTimer.watchId!==null && nuraRunTimer.watchId>=0 && navigator.geolocation) navigator.geolocation.clearWatch(nuraRunTimer.watchId);
+      if(nuraRunTimer.intervalo) clearInterval(nuraRunTimer.intervalo);
+      nuraRunTimer={activo:false,inicio:0,acumulado:0,watchId:null,ultimoPunto:null,metros:0,intervalo:null};
+      if(input) input.value=''; actualizarVistaCronometro(); renderizarProgresoCarrera(); alert('¡Carrera guardada! Tu progreso semanal se ha actualizado.');
+    }
+    function renderizarProgresoCarrera() {
+      const el=document.getElementById('runProgressCard'); if(!el) return; let logs=[]; try { logs=JSON.parse(localStorage.getItem('nuraRunRegistros')||'[]'); } catch(e){}
+      const ahora=new Date(); const inicioSemana=new Date(ahora); const dia=(ahora.getDay()+6)%7; inicioSemana.setHours(0,0,0,0); inicioSemana.setDate(ahora.getDate()-dia);
+      const semana=logs.filter(x=>new Date(x.fecha)>=inicioSemana); const totalKm=semana.reduce((a,x)=>a+Number(x.km||0),0); const totalMs=semana.reduce((a,x)=>a+Number(x.ms||0),0);
+      const filas=logs.slice(-8).reverse().map(x=>`<div style="padding:10px 0;border-bottom:1px solid #e6eeeb"><strong>${new Date(x.fecha).toLocaleDateString()}</strong><p style="color:#607d7a;margin-top:4px">${Number(x.km).toFixed(2)} km · ${formatoTiempoCarrera(x.ms)} · Objetivo ${x.objetivo==='inicial'?'caminar/trotar':x.objetivo+' km'}</p></div>`).join('');
+      el.innerHTML=`<h3>📈 Mi progreso semanal</h3><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px"><div style="background:#eff8f3;border-radius:12px;padding:10px;text-align:center"><strong style="font-size:20px">${totalKm.toFixed(2)}</strong><div style="font-size:12px;color:#607d7a">km esta semana</div></div><div style="background:#eff8f3;border-radius:12px;padding:10px;text-align:center"><strong style="font-size:20px">${semana.length}</strong><div style="font-size:12px;color:#607d7a">sesiones</div></div><div style="background:#eff8f3;border-radius:12px;padding:10px;text-align:center"><strong style="font-size:20px">${formatoTiempoCarrera(totalMs).slice(0,5)}</strong><div style="font-size:12px;color:#607d7a">tiempo total</div></div></div><h4 style="margin-top:16px">Últimas carreras</h4>${filas||'<p style="color:#607d7a;margin-top:8px">Aún no hay carreras guardadas. Cuando termines tu primera sesión, aparecerá aquí.</p>'}<button class="btn-volver" onclick="borrarHistorialCarrera()">Borrar historial de carreras</button>`;
+    }
+    function borrarHistorialCarrera() { if(!confirm('¿Quieres borrar el historial de carreras guardado en este dispositivo?')) return; try { localStorage.removeItem('nuraRunRegistros'); } catch(e){} renderizarProgresoCarrera(); }
+
+    function marcarCarreraDia(indice, valor) {
+        let completados = {}; try { completados = JSON.parse(localStorage.getItem('nuraRunSemana') || '{}'); } catch(e) {}
+        completados[indice] = !!valor; try { localStorage.setItem('nuraRunSemana',JSON.stringify(completados)); } catch(e) {}
+        generarPlanCorrer();
+    }
+    function reiniciarCarreraSemana() { try { localStorage.removeItem('nuraRunSemana'); } catch(e) {} generarPlanCorrer(); }
+
     function mostrarPlanSemanal(semana) {
 
+        const notaBienestar = `<div class="card" style="border-left:4px solid #1b8f72;margin-bottom:16px;"><b>🌿 Recomendación de bienestar</b><p style="margin-top:6px;line-height:1.5;color:#607d7a;">Este plan ofrece orientación general y no sustituye una valoración profesional. Si tienes una condición médica, dolor persistente, síntomas preocupantes o necesitas un plan clínico de alimentación, consulta a un profesional de salud. Evita cambios extremos y adapta la actividad a cómo te sientes.</p></div>`;
         const nombre =
             datosNura.nombre || "amigo";
 
+        const orientacionPeso = crearOrientacionPeso();
         document.getElementById("app").innerHTML = `
-
             <div class="pantalla">
 
                 <div class="contenedor">
+                    ${notaBienestar}
+                    ${orientacionPeso}
 
                     <div class="cabecera">
 
@@ -4386,6 +4862,7 @@ function mostrarPortada() {
        INICIAR
     ===================================================== */
 
+    cargarPerfilNura();
     mostrarPortada();
 
 </script>
