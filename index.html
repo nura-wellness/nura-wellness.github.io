@@ -237,17 +237,6 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 9px;
         }
-        .catalogo-alimentos { display: grid; gap: 16px; margin-top: 10px; }
-        .grupo-alimentos { background: #f8fbfa; border: 1px solid #e3eeea; border-radius: 14px; padding: 12px; }
-        .titulo-grupo-alimentos { margin: 0 0 10px; color: #176b58; font-size: 14px; letter-spacing: .2px; }
-        .grupo-alimentos .alimentos-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-        .grupo-alimentos .alimento-btn { display: flex; align-items: center; justify-content: space-between; gap: 7px; text-align: left; padding: 10px 11px; min-height: 44px; border-width: 1px; border-radius: 10px; }
-        .alimento-nombre { line-height: 1.25; }
-        .alimento-estado { font-size: 15px; font-weight: 800; color: #8aa39a; flex: 0 0 auto; }
-        .alimento-btn.seleccionado .alimento-estado { color: #168565; }
-        .alimento-btn.evitado .alimento-estado { color: #b74c4c; }
-        @media (max-width: 480px) { .grupo-alimentos .alimentos-grid { grid-template-columns: 1fr; } }
-
 
         .alimento-btn {
             border: 2px solid #e0e7e5;
@@ -997,39 +986,7 @@
         @media(max-width:560px) { .casa-form { grid-template-columns:1fr; } .casa-hero { padding:20px 16px; } }
 
     
-        /* AJUSTE FINAL: mostrar la portada completa sin recortes */
-        .portada {
-            min-height: 100svh !important;
-            height: auto !important;
-            padding: 0 !important;
-            display: block !important;
-            background: #061c19 !important;
-            overflow: visible !important;
-        }
-        .portada-art {
-            display: block !important;
-            position: relative !important;
-            width: 100% !important;
-            max-width: 100vw !important;
-            margin: 0 !important;
-            line-height: 0 !important;
-        }
-        .portada-art img {
-            display: block !important;
-            width: 100% !important;
-            height: auto !important;
-            max-width: 100vw !important;
-            max-height: none !important;
-            object-fit: contain !important;
-            object-position: center center !important;
-        }
-        /* La portada artística contiene ya el diseño; se evita duplicar el banner móvil. */
-        .portada-mobile { display: none !important; }
-        @media (max-width: 649px) {
-            .portada-art { display: block !important; width: 100vw !important; max-width: 100vw !important; }
-            .portada-art img { width: 100% !important; height: auto !important; max-width: 100vw !important; max-height: none !important; }
-            .portada-hotspot { border-radius: 8px; }
-        }
+        /* Se elimina el override que forzaba la portada de escritorio en móvil. */
 </style>
 </head>
 
@@ -1126,79 +1083,72 @@
     ===================================================== */
 
     const alimentosDisponibles = [
-        // Proteínas animales
-        ["pollo", "🍗 Pollo", "Proteína"],
-        ["pavo", "🍗 Pechuga de pavo", "Proteína"],
+        ["pollo", "🐔 Pollo", "Proteína"],
+        ["carne", "🥩 Carne", "Proteína"],
         ["pescado", "🐟 Pescado", "Proteína"],
-        ["atun", "🐟 Atún", "Proteína"],
+        ["atun", "🐠 Atún", "Proteína"],
         ["salmon", "🍣 Salmón", "Proteína"],
-        ["sardina", "🐟 Sardina", "Proteína"],
         ["huevo", "🥚 Huevo", "Proteína"],
-        ["carne", "🥩 Res magra", "Proteína"],
-        ["cerdo", "🥩 Cerdo magro", "Proteína"],
-        ["camaron", "🦐 Camarón", "Proteína"],
-        ["jamon", "🍖 Jamón", "Procesados"],
-        ["salchicha", "🌭 Salchicha", "Procesados"],
-        ["atunLata", "🥫 Atún en lata", "Proteína"],
-        // Proteínas vegetales y leguminosas
+        ["queso", "🧀 Queso", "Proteína"],
+        ["leche", "🥛 Leche", "Lácteos"],
         ["frijoles", "🫘 Frijoles", "Leguminosas"],
         ["lentejas", "🫘 Lentejas", "Leguminosas"],
-        ["garbanzos", "🫘 Garbanzos", "Leguminosas"],
-        ["chicharos", "🟢 Chícharos", "Leguminosas"],
-        ["tofu", "🧊 Tofu", "Proteína vegetal"],
-        // Cereales y tubérculos
-        ["avena", "🌾 Avena", "Cereales"],
         ["arroz", "🍚 Arroz", "Cereales"],
-        ["tortilla", "🌽 Tortilla de maíz", "Cereales"],
+        ["avena", "🌾 Avena", "Cereales"],
+        ["tortilla", "🌽 Tortilla", "Cereales"],
         ["pan", "🍞 Pan", "Cereales"],
-        ["bolillo", "🥖 Bolillo", "Cereales"],
         ["pasta", "🍝 Pasta", "Cereales"],
-        ["quinoa", "🌾 Quinoa", "Cereales"],
-        ["tostadas", "🫓 Tostadas", "Cereales"],
-        ["galletas", "🍘 Galletas saladas", "Cereales"],
         ["papa", "🥔 Papa", "Tubérculos"],
+        ["verduras", "🥦 Verduras", "Vegetales"],
+        ["frutas", "🍎 Frutas", "Frutas"],
+        ["aguacate", "🥑 Aguacate", "Grasas"],
+        ["nueces", "🥜 Nueces y semillas", "Grasas"],
+        ["yogur", "🥣 Yogur", "Lácteos"],
         ["camote", "🍠 Camote", "Tubérculos"],
-        ["elote", "🌽 Elote", "Cereales"],
-        ["eloteGrano", "🌽 Granos de elote", "Cereales"],
-        // Verduras
-        ["verduras", "🥦 Verduras variadas", "Vegetales"],
-        ["brocoli", "🥦 Brócoli", "Vegetales"],
+        ["quinoa", "🌾 Quinoa", "Cereales"],
+        ["pepino", "🥒 Pepino", "Vegetales"],
+        ["zanahoria", "🥕 Zanahoria", "Vegetales"],
         ["espinaca", "🥬 Espinaca", "Vegetales"],
         ["nopales", "🌵 Nopales", "Vegetales"],
         ["calabacita", "🥒 Calabacita", "Vegetales"],
-        ["chayote", "🥒 Chayote", "Vegetales"],
-        ["zanahoria", "🥕 Zanahoria", "Vegetales"],
-        ["pepino", "🥒 Pepino", "Vegetales"],
         ["jitomate", "🍅 Jitomate", "Vegetales"],
+        ["brocoli", "🥦 Brócoli", "Vegetales"],
+        ["garbanzos", "🫘 Garbanzos", "Leguminosas"],
+        ["cremaCacahuate", "🥜 Crema de cacahuate", "Grasas"],
+        ["semillas", "🌻 Semillas", "Grasas"],
+        ["naranja", "🍊 Naranja", "Frutas"],
+        ["papaya", "🍈 Papaya", "Frutas"],
+        ["fresas", "🍓 Fresas", "Frutas"],
+        ["jamon", "🍖 Jamón", "Proteína"],
+        ["salchicha", "🌭 Salchicha", "Proteína"],
+        ["pavo", "🍗 Pechuga de pavo", "Proteína"],
+        ["cerdo", "🥩 Cerdo", "Proteína"],
+        ["camaron", "🦐 Camarón", "Proteína"],
+        ["sardina", "🐟 Sardina", "Proteína"],
+        ["tofu", "🧊 Tofu", "Proteína"],
+        ["champiñones", "🍄 Champiñones", "Vegetales"],
         ["pimiento", "🫑 Pimiento", "Vegetales"],
         ["cebolla", "🧅 Cebolla", "Vegetales"],
         ["col", "🥬 Col", "Vegetales"],
         ["lechuga", "🥬 Lechuga", "Vegetales"],
-        ["champiñones", "🍄 Champiñones", "Vegetales"],
         ["chayote", "🥒 Chayote", "Vegetales"],
-        // Frutas
+        ["elote", "🌽 Elote", "Vegetales"],
         ["manzana", "🍎 Manzana", "Frutas"],
-        ["pera", "🍐 Pera", "Frutas"],
-        ["naranja", "🍊 Naranja", "Frutas"],
-        ["papaya", "🍈 Papaya", "Frutas"],
-        ["fresas", "🍓 Fresas", "Frutas"],
         ["platano", "🍌 Plátano", "Frutas"],
+        ["pera", "🍐 Pera", "Frutas"],
         ["mango", "🥭 Mango", "Frutas"],
         ["uva", "🍇 Uvas", "Frutas"],
-        ["frutas", "🍎 Frutas variadas", "Frutas"],
-        // Lácteos
-        ["leche", "🥛 Leche", "Lácteos"],
-        ["yogur", "🥣 Yogur natural", "Lácteos"],
-        ["queso", "🧀 Queso", "Lácteos"],
+        ["atunLata", "🥫 Atún en lata", "Proteína"],
+        ["mayonesa", "🥄 Mayonesa", "Complementos"],
         ["crema", "🥛 Crema", "Lácteos"],
-        // Grasas y complementos
-        ["aguacate", "🥑 Aguacate", "Grasas saludables"],
-        ["nueces", "🥜 Nueces y semillas", "Grasas saludables"],
-        ["semillas", "🌻 Semillas", "Grasas saludables"],
-        ["cremaCacahuate", "🥜 Crema de cacahuate", "Grasas saludables"],
-        ["aceite", "🫒 Aceite", "Grasas saludables"],
-        ["mayonesa", "🥄 Mayonesa", "Complementos"]
+        ["bolillo", "🥖 Bolillo", "Cereales"],
+        ["tostadas", "🫓 Tostadas", "Cereales"],
+        ["galletas", "🍘 Galletas saladas", "Cereales"],
+        ["aceite", "🫒 Aceite", "Complementos"],
+        ["chicharos", "🟢 Chícharos", "Vegetales"],
+        ["eloteGrano", "🌽 Granos de elote", "Vegetales"]
     ];
+
     const menuDesayuno = [
         {texto:"Huevos con verduras y tortillas.", tags:["huevo","verduras","tortilla"]},
         {texto:"Huevos con aguacate y tortillas.", tags:["huevo","aguacate","tortilla"]},
@@ -2264,8 +2214,16 @@ function mostrarPortada() {
                         <button type="button" class="btn-mini" onclick="seleccionarTodosAlimentos()">Seleccionar todos</button>
                     </div>
 
-                    <div class="catalogo-alimentos">
-                        ${renderCatalogoAlimentos("incluidos")}
+                    <div class="alimentos-grid">
+                        ${alimentosDisponibles.map(alimento => `
+                            <button
+                                type="button"
+                                class="alimento-btn ${datosNura.alimentosIncluidos.includes(alimento[0]) ? "seleccionado" : ""}"
+                                id="incluye-${alimento[0]}"
+                                onclick="toggleAlimento('incluidos','${alimento[0]}')">
+                                ${alimento[1]}
+                            </button>
+                        `).join("")}
                     </div>
 
                     <div class="contador-alimentos" id="contadorIncluidos">
@@ -2276,8 +2234,16 @@ function mostrarPortada() {
                         <strong>🚫 ¿Hay alimentos que prefieres evitar?</strong>
                         <small>Opcional. NURA no los utilizará en tu menú.</small>
 
-                        <div class="catalogo-alimentos">
-                            ${renderCatalogoAlimentos("evitar")}
+                        <div class="alimentos-grid">
+                            ${alimentosDisponibles.map(alimento => `
+                                <button
+                                    type="button"
+                                    class="alimento-btn evitar-btn ${datosNura.alimentosEvitar.includes(alimento[0]) ? "evitado" : ""}"
+                                    id="evita-${alimento[0]}"
+                                    onclick="toggleAlimento('evitar','${alimento[0]}')">
+                                    ${alimento[1]}
+                                </button>
+                            `).join("")}
                         </div>
                     </div>
 
@@ -2334,38 +2300,6 @@ function mostrarPortada() {
         return "";
     }
 
-
-    const ordenCategoriasAlimentos = [
-        "Proteína", "Proteína vegetal", "Leguminosas", "Cereales",
-        "Tubérculos", "Vegetales", "Frutas", "Lácteos",
-        "Grasas saludables", "Procesados", "Complementos"
-    ];
-
-    function renderCatalogoAlimentos(tipo = "incluidos") {
-        const seleccion = tipo === "evitar" ? datosNura.alimentosEvitar : datosNura.alimentosIncluidos;
-        return ordenCategoriasAlimentos.map(categoria => {
-            const grupo = alimentosDisponibles.filter(a => a[2] === categoria);
-            if (!grupo.length) return "";
-            return `
-                <section class="grupo-alimentos">
-                    <h4 class="titulo-grupo-alimentos">${categoria}</h4>
-                    <div class="alimentos-grid">
-                        ${grupo.map(alimento => {
-                            const activo = seleccion.includes(alimento[0]);
-                            return `
-                                <button type="button"
-                                    class="alimento-btn ${tipo === "evitar" ? "evitar-btn" : ""} ${activo ? (tipo === "evitar" ? "evitado" : "seleccionado") : ""}"
-                                    id="${tipo === "evitar" ? "evita-" : "incluye-"}${alimento[0]}"
-                                    aria-pressed="${activo ? "true" : "false"}"
-                                    onclick="toggleAlimento('${tipo === "evitar" ? "evitar" : "incluidos"}','${alimento[0]}')">
-                                    <span class="alimento-nombre">${alimento[1]}</span>
-                                    <span class="alimento-estado">${activo ? "✓" : "+"}</span>
-                                </button>`;
-                        }).join("")}
-                    </div>
-                </section>`;
-        }).join("");
-    }
 
     function crearOpcion(campo, valor, titulo, descripcion = "") {
 
