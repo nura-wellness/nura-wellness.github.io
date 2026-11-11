@@ -770,14 +770,29 @@
 
         @media (max-width: 649px) {
             .portada-art { display:none; }
-            .portada-mobile { display:block; padding:0 0 1px; }
-            .portada-mobile .portada-banner { display:block; width:100%; height:auto; }
-            .portada-mobile .portada-card { padding:24px 20px; border-radius:22px; }
+            .portada-mobile { display:block; padding:0; }
+            .portada-mobile .portada-banner {
+                display:block;
+                width:100%;
+                height:auto;
+                max-width:100%;
+                object-fit:contain;
+            }
+            .portada-mobile .portada-card {
+                display:block;
+                padding:24px 20px;
+                border-radius:22px;
+                margin:16px auto 24px;
+                width:calc(100% - 28px);
+                max-width:520px;
+            }
             .portada {
-                min-height: 100svh;
-                padding: 18px 14px;
-                align-items: flex-end;
-                background-position: center top;
+                min-height:0;
+                height:auto;
+                padding:0;
+                display:block;
+                background:#061c19;
+                background-position:center top;
             }
 
             .portada-card {
@@ -986,6 +1001,13 @@
         @media(max-width:560px) { .casa-form { grid-template-columns:1fr; } .casa-hero { padding:20px 16px; } }
 
     
+        /* Ajuste móvil NURA: evita que la portada reserve una pantalla vacía */
+        @media (max-width: 649px) {
+            .portada-mobile { min-height:0; }
+            .portada-mobile .portada-banner { margin:0; }
+            .portada-mobile .portada-card { box-sizing:border-box; }
+        }
+
         /* Se elimina el override que forzaba la portada de escritorio en móvil. */
 </style>
 </head>
